@@ -1,0 +1,13 @@
+# Executables
+*.elf
+a.out
+
+# Build directory
+build/
+
+# Artifacts
+*.iso
+
+# IDE files
+.vscode
+.vs
