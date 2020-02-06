@@ -2,23 +2,23 @@ ENTRY (_start)
 
 SECTIONS
 {
-	KERNEL_VMA = 0x400000;
+	KERNEL_VMA = 0x200000;
 	. = KERNEL_VMA;
 	/* Add a symbol that indicates the start address of the kernel. */
 	_kernel_start = .;
-	.text ALIGN (4K) : AT (ADDR (.text) - 0)
+	.text ALIGN (4K) : AT (ADDR (.text) - KERNEL_VMA)
 	{
 		*(.text)
 	}
-	.rodata ALIGN (4K) : AT (ADDR (.rodata) - 0)
+	.rodata ALIGN (4K) : AT (ADDR (.rodata) - KERNEL_VMA)
 	{
 		*(.rodata)
 	}
-	.data ALIGN (4K) : AT (ADDR (.data) - 0)
+	.data ALIGN (4K) : AT (ADDR (.data) - KERNEL_VMA)
 	{
 		*(.data)
 	}
-	.bss ALIGN (4K) : AT (ADDR (.bss) - 0)
+	.bss ALIGN (4K) : AT (ADDR (.bss) - KERNEL_VMA)
 	{
 		*(COMMON)
 		*(.bss)

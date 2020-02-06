@@ -44,10 +44,10 @@ loaded_kernel_info_t awd_load_kernel(uint32_t baseAddress) {
         panic("Kernel is not a valid loadable ELF64 executable");
     }
     console_log("elf64", "- ELF Info ----------------------------------------------------------\n");
-    console_log("elf64", "%22s = 0x%08X\n", "mod_base", baseAddress);
-    console_log("elf64", "%22s = 0x%08X\n", "entry_point", elf_header->e_entry);
-    console_log("elf64", "%22s = %d\n", "num_program_headers", elf_header->e_phnum);
-    console_log("elf64", "%22s = %d\n", "num_section_headers", elf_header->e_shnum);
+    console_log("elf64", "%19s = 0x%08X\n", "mod_base", baseAddress);
+    console_log("elf64", "%19s = 0x%08X\n", "entry_point", elf_header->e_entry);
+    console_log("elf64", "%19s = %d\n", "num_program_headers", elf_header->e_phnum);
+    console_log("elf64", "%19s = %d\n", "num_section_headers", elf_header->e_shnum);
     console_log("elf64", "- Load Log ----------------------------------------------------------\n");
 
     // console_log("elf64", "LOAD (PH%d) from 0x%08X (%d bytes) -> 0x%08X\n", 0, 100, 100, 1000);

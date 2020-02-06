@@ -14,15 +14,15 @@ void map_kernel(loaded_kernel_info_t kernel_info) {
     uint64_t address = kernel_info.virt_start;
     const uint8_t present_writable = 0b11;
 
-    index_p1 = (address >> 12) & 0b111111111;
-    index_p2 = (address >> 21) & 0b111111111;
-    index_p3 = (address >> 30) & 0b111111111;
-    index_p4 = (address >> 39) & 0b111111111;
+    index_p1 = (address >> 12) & 511;
+    index_p2 = (address >> 21) & 511;
+    index_p3 = (address >> 30) & 511;
+    index_p4 = (address >> 39) & 511;
 
-    console_log("paging", "P4: %3d\n", index_p4);
-    console_log("paging", "P3: %3d\n", index_p3);
-    console_log("paging", "P2: %3d\n", index_p2);
-    console_log("paging", "P1: %3d\n", index_p1);
+    // console_log("paging", "P4: %3d\n", index_p4);
+    // console_log("paging", "P3: %3d\n", index_p3);
+    // console_log("paging", "P2: %3d\n", index_p2);
+    // console_log("paging", "P1: %3d\n", index_p1);
     console_log("paging", "PML4[%03d] = 0x%08X (P3)\n", index_p4, ((uintptr_t)&paging_kernel_p3) | present_writable);
     console_log("paging", "PDPT[%03d] = 0x%08X (P2)\n", index_p3, ((uintptr_t)&paging_kernel_p2) | present_writable);
 
