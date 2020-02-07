@@ -7,6 +7,7 @@
 #include "awd/console.h"
 #include "awd/error.h"
 #include "elf64.h"
+#include "memory.h"
 #include "multiboot.h"
 #include "stdio.h"
 
@@ -43,6 +44,7 @@ loaded_kernel_info_t awd_load_kernel(uint32_t baseAddress) {
     if (elf_check_executable(elf_header) == 0) {
         panic("Kernel is not a valid loadable ELF64 executable");
     }
+
     console_log("elf64", "- ELF Info ----------------------------------------------------------\n");
     console_log("elf64", "%19s = 0x%08X\n", "mod_base", baseAddress);
     console_log("elf64", "%19s = 0x%08X\n", "entry_point", elf_header->e_entry);
@@ -50,13 +52,9 @@ loaded_kernel_info_t awd_load_kernel(uint32_t baseAddress) {
     console_log("elf64", "%19s = %d\n", "num_section_headers", elf_header->e_shnum);
     console_log("elf64", "- Load Log ----------------------------------------------------------\n");
 
-    // console_log("elf64", "LOAD (PH%d) from 0x%08X (%d bytes) -> 0x%08X\n", 0, 100, 100, 1000);
-
-    uint32_t kernel_phys_address = 0x400000;
-
-    kernel_info.virt_start = 0xFFFFFFFFFFFFFFF;
+    // Pass 1: Discovery
+    kernel_info.virt_start = 0xFFFFFFFFFFFFFFF0;
     kernel_info.phys_start = 0xFFFFFFFFFFFFFFF0;
-
     for (unsigned int i = 0; i < elf_header->e_phnum; i++) {
         uint32_t ph_offset = elf_header->e_phoff + (elf_header->e_phentsize * i);
         elf64_pheader_t *pheader = (elf64_pheader_t *)(baseAddress + ph_offset);
@@ -65,10 +63,8 @@ loaded_kernel_info_t awd_load_kernel(uint32_t baseAddress) {
         if (pheader->p_type != 1) {
             continue;
         }
-        uint32_t size = pheader->p_filesz;
+
         uint32_t ph_file_address = baseAddress + pheader->p_offset;
-        uint32_t dest_offset = (pheader->p_vaddr - kernel_phys_address);
-        uint32_t dest_address = kernel_phys_address + dest_offset;
 
         if (kernel_info.virt_start > pheader->p_vaddr) {
             kernel_info.virt_start = pheader->p_vaddr;
@@ -76,6 +72,27 @@ loaded_kernel_info_t awd_load_kernel(uint32_t baseAddress) {
         if (kernel_info.phys_start > ph_file_address) {
             kernel_info.phys_start = ph_file_address;
         }
+    }
+
+    // HACK: Figure out size of kernel, then only malloc that much
+    kernel_info.phys_size = 0x20000;
+    kernel_info.virt_size = 0x20000;
+    uintptr_t kernel_phys_address = (uintptr_t)malloc_page(kernel_info.phys_size);
+
+    // Pass 2: Loading
+    for (unsigned int i = 0; i < elf_header->e_phnum; i++) {
+        uint32_t ph_offset = elf_header->e_phoff + (elf_header->e_phentsize * i);
+        elf64_pheader_t *pheader = (elf64_pheader_t *)(baseAddress + ph_offset);
+
+        // We don't care about anything that isn't a load program header, so skip it.
+        if (pheader->p_type != 1) {
+            continue;
+        }
+
+        uint32_t size = pheader->p_filesz;
+        uint32_t ph_file_address = baseAddress + pheader->p_offset;
+        uint32_t dest_offset = (pheader->p_vaddr) - kernel_info.virt_start;
+        uint32_t dest_address = kernel_phys_address + dest_offset;
 
         memcpy((void *)dest_address, (void *)ph_file_address, size);
 
@@ -88,10 +105,9 @@ loaded_kernel_info_t awd_load_kernel(uint32_t baseAddress) {
 
     console_log("elf64", "---------------------------------------------------------------------\n");
 
-    kernel_info.virt_size = 0x40000;
-    kernel_info.phys_size = 0x40000;
+    kernel_info.phys_start = kernel_phys_address;
 
     kernel_info.virt_entry = elf_header->e_entry;
-    kernel_info.phys_start = kernel_phys_address;
+
     return kernel_info;
 }

@@ -2,7 +2,7 @@ ENTRY (_start)
 
 SECTIONS
 {
-	KERNEL_VMA = 0x200000;
+	KERNEL_VMA = 0xFFFFFFFF00000000;
 	. = KERNEL_VMA;
 	/* Add a symbol that indicates the start address of the kernel. */
 	_kernel_start = .;

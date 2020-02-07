@@ -7,6 +7,7 @@
 ; -----------------------------------------------------------------------------
 
 section .rodata
+align 8
 gdt64:
     dq 0 ; zero entry
 .code: equ $ - gdt64 ; new
@@ -19,6 +20,7 @@ gdt64:
 ; -----------------------------------------------------------------------------
 section .data
 global k_ptr
+align 8
 k_ptr:
 	dq	0x400000
 
@@ -28,7 +30,6 @@ section .text
 global enter_kernel
 
 enter_kernel:
-    ;mov [k_ptr], eax
     lgdt [gdt64.pointer]
     jmp gdt64.code:longmode_enter_kernel
 
