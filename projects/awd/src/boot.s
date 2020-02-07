@@ -31,16 +31,14 @@ stack_top:
 
 ; Page Tables
 global paging_pml4
-global paging_kernel_p3
-global paging_kernel_p2
 
 align 4096
 paging_pml4:
     resb 4096
-paging_kernel_p3:
-    resb 4096
-paging_kernel_p2:
-    resb 4096
+
+global multiboot_struct_ptr
+multiboot_struct_ptr:
+    resb 4
 
 ; Bootstub
 ; -----------------------------------------------------------------------------
@@ -53,7 +51,7 @@ _start:
     cli                             ; Prevent any interrupts
     mov     esp, stack_top          ; Setup Stack
     mov     ebp, stack_top
-    push    ebx                     ; Push multiboot structure as a param
+    mov     [multiboot_struct_ptr], ebx
     push    eax                     ; Push magic
     call    awd_main                ; Start AWD
 .end:

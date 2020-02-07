@@ -2,6 +2,7 @@ ENTRY(_start)
 SECTIONS
 {
 	. = 1M;
+	awd_phys_start = .;
 	.text BLOCK(4K) : ALIGN(4K)
 	{
 		*(.multiboot)
@@ -23,4 +24,5 @@ SECTIONS
 		*(COMMON)
 		*(.bss)
 	}
+	awd_phys_end = .;
 }

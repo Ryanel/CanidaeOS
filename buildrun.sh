@@ -1,3 +1,3 @@
-#./clean.sh
+./clean.sh
 ./build.sh
 ./run.sh

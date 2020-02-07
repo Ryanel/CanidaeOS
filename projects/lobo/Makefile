@@ -7,7 +7,7 @@ LINK_FLAGS :=
 LINK_POST_FLAGS := -lgcc
 ASM_FLAGS := -felf64
 
-SHARED_FLAGS := -m64 -ffreestanding -Og -g -nostdlib -z max-page-size=0x1000 -mcmodel=large -mno-red-zone -mno-mmx -mno-sse -mno-sse2 -Isrc/includes/
+SHARED_FLAGS := -m64 -ffreestanding -O2 -g -nostdlib -z max-page-size=0x1000 -mcmodel=large -mno-red-zone -mno-mmx -mno-sse -mno-sse2 -Isrc/includes/
 C_FLAGS := $(SHARED_FLAGS) 
 CPP_FLAGS := $(SHARED_FLAGS) -fno-exceptions -fno-rtti 
 
