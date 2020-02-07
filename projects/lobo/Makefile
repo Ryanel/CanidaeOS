@@ -1,5 +1,5 @@
 # Directories
-DIR_BUILD ?= ../../build/lobo
+DIR_BUILD ?= ../../build/
 DIR_SOURCE := src
 
 # Flags
@@ -23,16 +23,16 @@ LOBO_OBJECTS := $(LOBO_SOURCES:%=$(DIR_BUILD)/%.o)
 # Make Rules
 all: lobo
 
-lobo: $(DIR_BUILD)/lobo.elf
+lobo: $(DIR_BUILD)/lobo/lobo.elf
 
 clean:
 	$(RM) -r $(DIR_BUILD)
 
 # Build Rules
-$(DIR_BUILD)/lobo.elf: $(LOBO_OBJECTS)
+$(DIR_BUILD)/lobo/lobo.elf: $(LOBO_OBJECTS)
 	@mkdir -p $(dir $@)
 	@echo "      LNK lobo.elf" 
-	@$(CPP) -T $(DIR_SOURCE)/x86_64/link.ld -o $(DIR_BUILD)/lobo.elf $(CPP_FLAGS) $(LINK_FLAGS) $(LOBO_OBJECTS) $(LINK_POST_FLAGS)
+	@$(CPP) -T $(DIR_SOURCE)/x86_64/link.ld -o $(DIR_BUILD)/lobo/lobo.elf $(CPP_FLAGS) $(LINK_FLAGS) $(LOBO_OBJECTS) $(LINK_POST_FLAGS)
 
 $(DIR_BUILD)/%.s.o: %.s
 	@mkdir -p $(dir $@)

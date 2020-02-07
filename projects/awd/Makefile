@@ -1,5 +1,5 @@
 # Directories
-DIR_BUILD ?= ../../build/awd
+DIR_BUILD ?= ../../build/
 DIR_SOURCE := src
 
 # Flags
@@ -19,19 +19,19 @@ AWD_OBJECTS := $(AWD_SOURCES:%=$(DIR_BUILD)/%.o)
 # Make Rules
 all: awd
 
-awd: $(DIR_BUILD)/awd.elf
+awd: $(DIR_BUILD)/awd/awd.elf
 
 clean:
 	$(RM) -r $(DIR_BUILD)
 
 qemu: awd
-	qemu-system-x86_64 -kernel ../build/awd/awd.elf
+	qemu-system-x86_64 -kernel .$(DIR_BUILD)/awd/awd.elf
 
 # Build Rules
-$(DIR_BUILD)/awd.elf: $(AWD_OBJECTS)
+$(DIR_BUILD)/awd/awd.elf: $(AWD_OBJECTS)
 	@mkdir -p $(dir $@)
 	@echo "      LNK awd.elf" 
-	@$(CC) -T $(DIR_SOURCE)/link.ld -o $(DIR_BUILD)/awd.elf $(C_FLAGS) $(LINK_FLAGS) $(AWD_OBJECTS) $(LINK_POST_FLAGS)
+	@$(CC) -T $(DIR_SOURCE)/link.ld -o $(DIR_BUILD)/awd/awd.elf $(C_FLAGS) $(LINK_FLAGS) $(AWD_OBJECTS) $(LINK_POST_FLAGS)
 
 $(DIR_BUILD)/%.s.o: %.s
 	@mkdir -p $(dir $@)
