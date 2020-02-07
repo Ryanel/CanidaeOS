@@ -5,7 +5,7 @@ DIR_SOURCE := src
 # Flags
 LINK_FLAGS := 
 LINK_POST_FLAGS := -lgcc
-ASM_FLAGS := -felf32
+ASM_FLAGS := -felf32 -w-zext-reloc
 C_FLAGS := -ffreestanding -Og -g -nostdlib -Isrc/includes/
 
 # Compilers
@@ -13,7 +13,7 @@ ASM := nasm
 CC := i686-elf-gcc
 
 # Files
-AWD_SOURCES := $(shell find $(DIR_SOURCE) -name *.cpp -or -name *.c -or -name *.s)
+AWD_SOURCES := $(shell find $(DIR_SOURCE) -name *.c -or -name *.s)
 AWD_OBJECTS := $(AWD_SOURCES:%=$(DIR_BUILD)/%.o)
 
 # Make Rules

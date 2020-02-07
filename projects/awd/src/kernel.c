@@ -45,12 +45,14 @@ loaded_kernel_info_t awd_load_kernel(uint32_t baseAddress) {
         panic("Kernel is not a valid loadable ELF64 executable");
     }
 
+#ifdef DEBUG_LOG
     console_log("elf64", "- ELF Info ----------------------------------------------------------\n");
     console_log("elf64", "%19s = 0x%08X\n", "mod_base", baseAddress);
     console_log("elf64", "%19s = 0x%08X\n", "entry_point", elf_header->e_entry);
     console_log("elf64", "%19s = %d\n", "num_program_headers", elf_header->e_phnum);
     console_log("elf64", "%19s = %d\n", "num_section_headers", elf_header->e_shnum);
     console_log("elf64", "- Load Log ----------------------------------------------------------\n");
+#endif
 
     // Pass 1: Discovery
     kernel_info.virt_start = 0xFFFFFFFFFFFFFFF0;
@@ -96,15 +98,16 @@ loaded_kernel_info_t awd_load_kernel(uint32_t baseAddress) {
 
         memcpy((void *)dest_address, (void *)ph_file_address, size);
 
-        uint32_t vaddr_lo = pheader->p_vaddr & 0xFFFFFFFF;
-        uint32_t vaddr_hi = pheader->p_vaddr >> 32;
-
-        console_log("elf64", "LOAD<%d> from [p]0x%08X -> [p]0x%08X [v]0x%08X%08X\n", i, ph_file_address, dest_address,
-                    vaddr_hi, vaddr_lo);
+#ifdef DEBUG_LOG
+        console_log("elf64", "LOAD<%d> from [p]0x%08X -> [p]0x%08X [v]", i, ph_file_address, dest_address);
+        console_print_uint64(pheader->p_vaddr);
+        console_printchar('\n');
+#endif
     }
 
+#ifdef DEBUG_LOG
     console_log("elf64", "---------------------------------------------------------------------\n");
-
+#endif
     kernel_info.phys_start = kernel_phys_address;
 
     kernel_info.virt_entry = elf_header->e_entry;

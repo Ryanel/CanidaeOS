@@ -98,3 +98,10 @@ void console_log(const char* cat, const char* fmt, ...) {
     vprintf(fmt, args);
     va_end(args);
 }
+
+void console_print_uint64(uint64_t tp) {
+    uint32_t vaddr_lo = tp & 0xFFFFFFFF;
+    uint32_t vaddr_hi = tp >> 32;
+
+    printf("0x%08X%08X", vaddr_hi, vaddr_lo);
+}

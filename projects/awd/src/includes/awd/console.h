@@ -1,6 +1,8 @@
 #ifndef AWD_CONSOLE_H
 #define AWD_CONSOLE_H
 
+#include <stdint.h>
+
 /// Initialises the console
 void console_init();
 
@@ -24,4 +26,8 @@ unsigned int console_getY();
 
 /// Log to screen in a nice formatted way
 void console_log(const char* cat, const char* fmt, ...);
+
+/// Print a 64-bit number correctly
+void console_print_uint64(uint64_t tp);
+
 #endif  // AWD_CONSOLE_H
