@@ -1,3 +1,6 @@
+# Config
+MAKE_OPTS=-j4
+
 # Set build directory
 if [ -z "$DIR_BUILD" ]
 then
@@ -9,19 +12,17 @@ mkdir -p $DIR_BUILD
 # Start compiling projects
 cd projects
 
-cd awd
-DIR_BUILD=$DIR_BUILD make awd -j4
-cd ..
-
-cd lobo
-DIR_BUILD=$DIR_BUILD make lobo -j4
-cd ..
+echo "Compiling AWD -------------------------------------"
+cd awd; DIR_BUILD=$DIR_BUILD make awd $MAKE_OPTS; cd ..
+echo "Compiling Lobo ------------------------------------"
+cd lobo; DIR_BUILD=$DIR_BUILD make lobo $MAKE_OPTS; cd ..
 
 cd .. # Projects
 
 # Build ISO
 mkdir -p $DIR_BUILD/sysroot/
 cp -r data/iso/* $DIR_BUILD/sysroot/
+
 cp $DIR_BUILD/awd/awd.elf $DIR_BUILD/sysroot/boot.elf
 cp $DIR_BUILD/lobo/lobo.elf $DIR_BUILD/sysroot/kernel.elf
 

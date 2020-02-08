@@ -6,7 +6,7 @@ DIR_SOURCE := src
 LINK_FLAGS := 
 LINK_POST_FLAGS := -lgcc
 ASM_FLAGS := -felf32 -w-zext-reloc
-C_FLAGS := -ffreestanding -O2 -g -nostdlib -Isrc/includes/
+C_FLAGS := -ffreestanding -O2 -g -nostdlib -Isrc/includes/ -DDEBUG_LOG
 
 # Compilers
 ASM := nasm
