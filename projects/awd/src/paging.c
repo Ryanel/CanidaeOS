@@ -30,8 +30,11 @@ void awd_add_mapped_region(uint64_t phys_start, uint64_t phys_end, uint64_t virt
 void awd_print_mapped_regions() {
     for (unsigned int i = 0; i < awd_mapped_region_index; i++) {
         awd_mapped_region_t region = awd_mapped_regions[i];
-        console_log("mapping", "[0x%08X-0x%08X] -> [0x%08X-0x%08X]\n", (uint32_t)region.phys_start,
-                    (uint32_t)region.phys_end, (uint32_t)region.virt_start, (uint32_t)region.virt_end);
+        console_log("mapping", "[0x%08X-0x%08X] -> [", (uint32_t)region.phys_start, (uint32_t)region.phys_end);
+        console_print_uint64(region.virt_start);
+        console_printstring("->");
+        console_print_uint64(region.virt_end);
+        console_printstring("]\n");
     }
 }
 
@@ -43,7 +46,7 @@ void awd_map_page(uint64_t phys, uint64_t virt) {
     uint32_t index_p3 = (virt >> 30) & 511;
     uint32_t index_p2 = (virt >> 21) & 511;
 
-    uint64_t *pg_p3, *pg_p2, *pg_p1;
+    uint64_t *pg_p3, *pg_p2;
 
     // Create or Load P3, as needed
     if (paging_pml4[index_p4] == 0) {
@@ -83,7 +86,7 @@ void awd_map_pages() {
 #ifdef DEBUG_LOG
         console_log("mapping", "[0x%08X-0x%08X] -> [", (uint32_t)region.phys_start, (uint32_t)region.phys_end);
         console_print_uint64(region.virt_start);
-        console_printstring("->");
+        console_printstring("-");
         console_print_uint64(region.virt_end);
         console_printstring("]\n");
 #endif

@@ -39,6 +39,7 @@ loaded_kernel_info_t awd_load() {
     kernel_mapped_region.virt_start = kernel.virt_start;
     kernel_mapped_region.virt_end = kernel.virt_start + kernel.virt_size;
     awd_add_mapped_region_direct(kernel_mapped_region);
+
     return kernel;
 }
 

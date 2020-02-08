@@ -36,8 +36,8 @@ void console_writechar(unsigned int x, unsigned int y, char c, unsigned char att
 }
 
 void console_scroll() {
-    for (int line = 0; line < (console.height - 1); line++) {
-        for (int x = 0; x < console.width; x++) {
+    for (unsigned int line = 0; line < (console.height - 1); line++) {
+        for (unsigned int x = 0; x < console.width; x++) {
             unsigned int src = 2 * (((line + 1) * console.width) + x);
             unsigned int dest = 2 * ((line * console.width) + x);
 
@@ -49,7 +49,7 @@ void console_scroll() {
         }
     }
     // Clear last line
-    for (int x = 0; x < console.width; x++) {
+    for (unsigned int x = 0; x < console.width; x++) {
         console_writechar(x, console.height - 1, ' ', console.color);
     }
 }
