@@ -2,6 +2,8 @@
 #include <awd/error.h>
 #include <stdint.h>
 
+#include "memory.h"
+
 uintptr_t malloc_base = 0x400000;
 uintptr_t malloc_current = 0x400000;
 uintptr_t malloc_limit = 0x401000;

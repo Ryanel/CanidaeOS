@@ -1,5 +1,5 @@
 # Config
-MAKE_OPTS=-j4
+MAKE_OPTS=-j1
 
 # Set build directory
 if [ -z "$DIR_BUILD" ]
@@ -27,3 +27,6 @@ cp $DIR_BUILD/awd/awd.elf $DIR_BUILD/sysroot/boot.elf
 cp $DIR_BUILD/lobo/lobo.elf $DIR_BUILD/sysroot/kernel.elf
 
 grub-mkrescue -o $DIR_BUILD/bootable.iso $DIR_BUILD/sysroot/ &> /dev/null
+
+wc -c $DIR_BUILD/sysroot/boot.elf
+wc -c $DIR_BUILD/sysroot/kernel.elf

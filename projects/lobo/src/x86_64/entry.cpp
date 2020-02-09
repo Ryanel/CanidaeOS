@@ -1,16 +1,16 @@
+#include <stddef.h>
 #include <stdint.h>
-#include <stdio.h>
 
 #include "awd/awd_info.h"
-#include "kernel/console.h"
+#include "drivers/x86_64/serial.h"
+#include "kernel/log.h"
 
 extern "C" int kernel_entry(awd_info_t* awd_info) {
-    console_init();
-    console_setcursor(0, awd_info->log_cursor_y);
-
-    console_log("lobo", "Lobo Kernel [v.0.0.0.1]\n");
-    console_log("lobo", "Entering infinite loop\n");
-
+    awd_info = awd_info;
+    KernelLog kernel_log;
+    SerialDevice serial_device;
+    kernel_log.SetSerialLogging(&serial_device);
+    kernel_log.WriteString("Hello, World!\n");
     while (true) {
     }
 }

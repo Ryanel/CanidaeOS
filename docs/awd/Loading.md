@@ -3,16 +3,21 @@
 The kernel is loaded as an ELF file into memory by the multiboot bootloader.
 African Wild Dog's job is to parse the kernel and load it to the correct memory areas.
 
-## Parsing
-Initially, AWD will check to make sure that the loaded module by GRUB is infact a 64-bit x86 ELF file. It will then take note and save any needed information for later.
+## Parsing & Loading
 
-Then, it will go over each LOAD program buffer, and load the section into a buffer.
+1. Initially, AWD will check to make sure that the loaded module by GRUB is infact a x86_64 ELF file.
+2. Then, it gathers information like the virtual base address and memory size.
+3. After that, it will go over each LOAD Program Header, and load the section from the memory image into a buffer
 
 ## Paging
-AWD will take the required sections of the kernel and map them to where they're expected to be.
+AWD takes the required sections of the kernel and maps them to where they're expected to be.
 
 Specifically:
 
-* The first megabyte is identity mapped
-* The kernel is mapped to it's proper virtual address, while physically it's still in the buffer.
-* Modules are unmapped.
+* The two megabytes are identity mapped
+* The kernel is mapped to its proper virtual address.
+* Modules are unmapped (unless they are within the first two megabytes)
+
+## Configuration
+
+The current state of the hardware and multiboot header are saved in a awd_info_t structure, which is passed by AWD into the kernel.

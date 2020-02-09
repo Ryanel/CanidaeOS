@@ -5,6 +5,7 @@
 
 #include "awd/console.h"
 #include "awd/kernel.h"
+#include "awd/paging.h"
 #include "memory.h"
 
 awd_mapped_region_t awd_mapped_regions[AWD_MAPPED_REGIONS_MAX];
