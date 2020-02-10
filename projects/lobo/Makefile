@@ -8,7 +8,7 @@ LINK_POST_FLAGS := -lgcc
 ASM_FLAGS := -felf64
 
 WARNING_FLAGS := -Wall -Wextra -Wfloat-equal -Wundef -Wcast-align -Wwrite-strings -Wlogical-op -Wredundant-decls -Wshadow 
-SHARED_FLAGS := -m64 -ffreestanding -Og -g -fno-omit-frame-pointer -nostdlib \
+SHARED_FLAGS := -m64 -ffreestanding -O0 -g -fno-omit-frame-pointer -nostdlib \
 -z max-page-size=0x1000 -mcmodel=large -mno-red-zone -mno-mmx -mno-sse -mno-sse2 -Isrc/includes/ $(WARNING_FLAGS)
 C_FLAGS := $(SHARED_FLAGS) 
 CPP_FLAGS := $(SHARED_FLAGS) -fno-exceptions -fno-rtti  -Woverloaded-virtual

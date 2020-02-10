@@ -14,6 +14,7 @@ cd projects
 
 echo "Compiling AWD -------------------------------------"
 cd awd; DIR_BUILD=$DIR_BUILD make awd $MAKE_OPTS; cd ..
+
 echo "Compiling Lobo ------------------------------------"
 cd lobo; DIR_BUILD=$DIR_BUILD make lobo $MAKE_OPTS; cd ..
 

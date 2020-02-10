@@ -18,13 +18,10 @@ void SerialDevice::PrintChar(const char c) {
         deviceInit = true;
     }
 
-    while ((inb(port + 5) & 0x20) == 0) {
-    }
+    while ((inb(port + 5) & 0x20) == 0) {}
 
     outb(port, c);
 
     // Always print a carridge return on newline
-    if (c == '\n') {
-        PrintChar('\r');
-    }
+    if (c == '\n') { PrintChar('\r'); }
 }
