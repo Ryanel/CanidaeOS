@@ -7,8 +7,8 @@
 
 #include "kernel/log.h"
 
-static void print_int_padding(KernelLog& log, int length, char* arg,
-                              bool fmt_length_zeropad) {
+static void vprintf_print_padding(KernelLog& log, int length, char* arg,
+                                  bool fmt_length_zeropad) {
     if (length != 0) {
         int  charsToPrint = length - strlen(arg);
         char charToPrint  = ' ';
@@ -17,7 +17,7 @@ static void print_int_padding(KernelLog& log, int length, char* arg,
     }
 }
 
-void printf(const char* fmt, ...) {
+void vprintf(const char* fmt, va_list arg) {
     // Cache kernel log reference...
     KernelLog& log = KernelLog::Get();
 
@@ -29,12 +29,10 @@ void printf(const char* fmt, ...) {
     bool        fmt_left_justify   = false;
 
     // Argument variables
-    va_list      arg;
+
     unsigned int arg_int;
     uint64_t     arg_int64;
     char*        arg_str;
-
-    va_start(arg, fmt);
 
     // Scan along the format string
     for (fmt_scan = fmt; *fmt_scan != '\0'; fmt_scan++) {
@@ -87,7 +85,13 @@ void printf(const char* fmt, ...) {
 
             case 's':
                 arg_str = va_arg(arg, char*);
-                log.WriteString(arg_str);
+                if (fmt_left_justify) {
+                    log.WriteString(arg_str);
+                    vprintf_print_padding(log, fmt_length, arg_str, false);
+                } else {
+                    vprintf_print_padding(log, fmt_length, arg_str, false);
+                    log.WriteString(arg_str);
+                }
                 break;
 
             case 'c':
@@ -106,11 +110,11 @@ void printf(const char* fmt, ...) {
                 arg_str = itoa(arg_int, 16);
                 if (fmt_left_justify) {
                     log.WriteString(arg_str);
-                    print_int_padding(log, fmt_length, arg_str,
-                                      fmt_length_zeropad);
+                    vprintf_print_padding(log, fmt_length, arg_str,
+                                          fmt_length_zeropad);
                 } else {
-                    print_int_padding(log, fmt_length, arg_str,
-                                      fmt_length_zeropad);
+                    vprintf_print_padding(log, fmt_length, arg_str,
+                                          fmt_length_zeropad);
                     log.WriteString(arg_str);
                 }
 
@@ -121,11 +125,11 @@ void printf(const char* fmt, ...) {
                 arg_str   = itoa(arg_int64, 16);
                 if (fmt_left_justify) {
                     log.WriteString(arg_str);
-                    print_int_padding(log, fmt_length, arg_str,
-                                      fmt_length_zeropad);
+                    vprintf_print_padding(log, fmt_length, arg_str,
+                                          fmt_length_zeropad);
                 } else {
-                    print_int_padding(log, fmt_length, arg_str,
-                                      fmt_length_zeropad);
+                    vprintf_print_padding(log, fmt_length, arg_str,
+                                          fmt_length_zeropad);
                     log.WriteString(arg_str);
                 }
                 break;
@@ -135,6 +139,11 @@ void printf(const char* fmt, ...) {
                 break;
         }
     }
+}
 
+void printf(const char* fmt, ...) {
+    va_list arg;
+    va_start(arg, fmt);
+    vprintf(fmt, arg);
     va_end(arg);
 }

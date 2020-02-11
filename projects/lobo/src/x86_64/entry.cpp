@@ -9,12 +9,11 @@
 SerialDevice boot_serial_device;
 
 extern "C" int kernel_entry(awd_info_t* awd_info) {
-    awd_info = awd_info;
+    awd_info        = awd_info;
+    auto& kernelLog = KernelLog::Get();
 
-    KernelLog::Get().SetSerialLogging(&boot_serial_device);
-
-    printf("0.00000 | lobo: Lobo Kernel [v 0.0.0.1]\n");
-    printf("0.00000 | lobo: Finished, idling.\n");
-
+    kernelLog.SetSerialLogging(&boot_serial_device);
+    kernelLog.Log("lobo", "Lobo Kernel [v 0.0.0.1]");
+    kernelLog.Log("lobo", "Finished, idling.");
     while (true) {}
 }
