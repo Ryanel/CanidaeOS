@@ -6,18 +6,15 @@
 #include "kernel/log.h"
 #include "stdio.h"
 
+SerialDevice boot_serial_device;
+
 extern "C" int kernel_entry(awd_info_t* awd_info) {
     awd_info = awd_info;
 
-    SerialDevice serial_device;
+    KernelLog::Get().SetSerialLogging(&boot_serial_device);
 
-    KernelLog::Get().SetSerialLogging(&serial_device);
-    KernelLog::Get().WriteString("Hello, World!\n");
+    printf("0.00000 | lobo: Lobo Kernel [v 0.0.0.1]\n");
+    printf("0.00000 | lobo: Finished, idling.\n");
 
-    printf("Hello! %%d: %d %%s: %s %%x: 0x%08x\n", 123, "Test String",
-           0xABCDFEDC);
-    printf("Hello! A: %%p test= 0x%p\n", 0xFFFFFFFF800000AB);
-
-    KernelLog::Get().WriteString("[idling]\n");
     while (true) {}
 }

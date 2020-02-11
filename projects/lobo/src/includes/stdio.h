@@ -2,4 +2,4 @@
 
 #include <stdarg.h>
 
-void printf(char* fmt, ...);
+void printf(const char* fmt, ...);
