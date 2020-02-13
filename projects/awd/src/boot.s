@@ -55,6 +55,9 @@ _start:
     push    eax                     ; Push magic
     call    awd_main                ; Start AWD
 .end:
+    cli
+    hlt
+    jmp .end                        ; Infinite loop
 
 global paging_enable
 

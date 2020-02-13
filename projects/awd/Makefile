@@ -8,7 +8,7 @@ LINK_POST_FLAGS := -lgcc
 ASM_FLAGS := -felf32 -w-zext-reloc
 
 WARNING_FLAGS := -Wall -Wextra -Wfloat-equal -Wundef -Wcast-align -Wwrite-strings -Wlogical-op -Wredundant-decls -Wshadow
-C_FLAGS := -ffreestanding -Og -g -nostdlib -Isrc/includes/ -DDEBUG_LOG $(WARNING_FLAGS)
+C_FLAGS := -ffreestanding -Og -g -nostdlib -Isrc/includes/  $(WARNING_FLAGS)
 
 # Compilers
 ASM := nasm

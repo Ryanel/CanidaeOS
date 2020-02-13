@@ -22,13 +22,11 @@ void KernelLog::WriteString(const char* s) {
         i++;
     }
 }
-void KernelLog::SetSerialLogging(IKernelLogSerialOutDevice* device) {
-    serialOutDevice = device;
-}
+void KernelLog::SetSerialLogging(IKernelLogSerialOutDevice* device) { serialOutDevice = device; }
 
 void KernelLog::Log(const char* category, const char* fmt, ...) {
     // TODO: Hook up timing subsystem to kernel log output
-    printf("00.00000 | %5s: ", category);
+    printf("%5s: ", category);
 
     va_list arg;
     va_start(arg, fmt);

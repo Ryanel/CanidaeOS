@@ -1,7 +1,7 @@
 BasedOnStyle: Google
 IndentWidth: 4
 Language: Cpp
-ColumnLimit: 80
+ColumnLimit: 120
 AlignConsecutiveAssignments: true
 AlignConsecutiveDeclarations: true
 AllowShortBlocksOnASingleLine: true

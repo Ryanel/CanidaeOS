@@ -12,9 +12,9 @@ typedef struct {
     uint64_t virt_end;
 } awd_mapped_region_t;
 
-void awd_map_pages();
-void awd_add_mapped_region_direct(awd_mapped_region_t region);
-void awd_add_mapped_region(uint64_t phys_start, uint64_t phys_end, uint64_t virt_start, uint64_t virt_end);
+void paging_commit();
+void paging_map_region_direct(awd_mapped_region_t region);
+void paging_map_region(uint64_t phys_start, uint64_t phys_end, uint64_t virt_start, uint64_t virt_end);
 
-void awd_print_mapped_regions();
+void paging_print_regions();
 #endif

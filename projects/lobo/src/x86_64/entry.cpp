@@ -15,5 +15,6 @@ extern "C" int kernel_entry(awd_info_t* awd_info) {
     kernelLog.SetSerialLogging(&boot_serial_device);
     kernelLog.Log("lobo", "Lobo Kernel [v 0.0.0.1]");
     kernelLog.Log("lobo", "Finished, idling.");
-    while (true) {}
+
+    while (true) { asm("hlt"); }
 }
