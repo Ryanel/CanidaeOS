@@ -48,16 +48,16 @@ extern awd_main
 global _start:function (_start.end - _start)
 
 _start:
-    cli                             ; Prevent any interrupts
-    mov     esp, stack_top          ; Setup Stack
+    cli                                 ; Prevent any interrupts
+    mov     esp, stack_top              ; Setup Stack
     mov     ebp, stack_top
     mov     [multiboot_struct_ptr], ebx
-    push    eax                     ; Push magic
-    call    awd_main                ; Start AWD
+    push    eax                         ; Push magic
+    call    awd_main                    ; Start AWD
 .end:
     cli
     hlt
-    jmp .end                        ; Infinite loop
+    jmp .end                            ; Infinite loop
 
 global paging_enable
 

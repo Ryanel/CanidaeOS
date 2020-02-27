@@ -12,15 +12,22 @@
 #include "stdio.h"
 
 multiboot_module_t *awd_find_kernel(const multiboot_info_t *mb_info) {
+    uintptr_t module_struct_address = (uintptr_t)(mb_info->mods_addr);
+    uintptr_t module_struct_num     = (uintptr_t)(mb_info->mods_count);
+
+    // Search each module for "kernel" in the command line
+    for (size_t i = 0; i < module_struct_num; i++) {
+        multiboot_module_t *mod = (multiboot_module_t *)(module_struct_address + (sizeof(multiboot_module_t) * i));
+        if (strcmp((const char *)mod->cmdline, "kernel") == 0) { return mod; }
+    }
+
     if (mb_info->mods_count == 0) {
         panic(
             "No kernel found, no modules were loaded by the multiboot "
             "bootloader.");
     }
 
-    uintptr_t           module_struct_address = (uintptr_t)(mb_info->mods_addr);
-    multiboot_module_t *mod                   = (multiboot_module_t *)module_struct_address;
-    return mod;
+    return NULL;
 }
 
 int elf_check_executable(elf64_header_t *elf_header) {
@@ -37,7 +44,7 @@ loaded_kernel_info_t awd_load_kernel(uint32_t baseAddress) {
     loaded_kernel_info_t kernel_info;
     elf64_header_t *     elf_header = (elf64_header_t *)baseAddress;
 
-    if (elf_check_executable(elf_header) == 0) { panic("Kernel is not a valid loadable ELF64 executable"); }
+    if (elf_check_executable(elf_header) == 0) { panic("Kernel is not a valid loadable ELF64 executable\n"); }
 
 #ifdef DEBUG_LOG
     console_log("elf64", "- ELF Info --------------------------------------------------\n");
