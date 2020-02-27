@@ -1,5 +1,5 @@
 # Config
-MAKE_OPTS=-j1
+MAKE_OPTS=-j16
 
 # Set build directory
 if [ -z "$DIR_BUILD" ]
@@ -12,10 +12,10 @@ mkdir -p $DIR_BUILD
 # Start compiling projects
 cd projects
 
-echo "Compiling AWD -------------------------------------"
+echo "----------+- Compiling AWD ------------------------"
 cd awd; DIR_BUILD=$DIR_BUILD make awd $MAKE_OPTS; cd ..
 
-echo "Compiling Lobo ------------------------------------"
+echo "----------+- Compiling Lobo -----------------------"
 cd lobo; DIR_BUILD=$DIR_BUILD make lobo $MAKE_OPTS; cd ..
 
 cd .. # Projects

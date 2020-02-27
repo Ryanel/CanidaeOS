@@ -32,15 +32,15 @@ qemu: awd
 # Build Rules
 $(DIR_BUILD)/awd/awd.elf: $(AWD_OBJECTS)
 	@mkdir -p $(dir $@)
-	@echo "      LNK awd.elf" 
+	@echo "      LNK | awd.elf" 
 	@$(CC) -T $(DIR_SOURCE)/link.ld -o $(DIR_BUILD)/awd/awd.elf $(C_FLAGS) $(LINK_FLAGS) $(AWD_OBJECTS) $(LINK_POST_FLAGS)
 
 $(DIR_BUILD)/%.s.o: %.s
 	@mkdir -p $(dir $@)
-	@echo "      ASM $<" 
+	@echo "      ASM | $<" 
 	@$(ASM) $(ASM_FLAGS) -o $@ $<
 
 $(DIR_BUILD)/%.c.o: %.c
 	@mkdir -p $(dir $@)
-	@echo "        C $<" 
+	@echo "        C | $<" 
 	@$(CC) $(C_FLAGS) -c $< -o $@ 

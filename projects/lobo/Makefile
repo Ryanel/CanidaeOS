@@ -33,20 +33,20 @@ clean:
 # Build Rules
 $(DIR_BUILD)/lobo/lobo.elf: $(LOBO_OBJECTS)
 	@mkdir -p $(dir $@)
-	@echo "      LNK lobo.elf" 
+	@echo "      LNK | lobo.elf" 
 	@$(CPP) -T $(DIR_SOURCE)/x86_64/link.ld -o $(DIR_BUILD)/lobo/lobo.elf $(CPP_FLAGS) $(LINK_FLAGS) $(LOBO_OBJECTS) $(LINK_POST_FLAGS)
 
 $(DIR_BUILD)/%.s.o: %.s
 	@mkdir -p $(dir $@)
-	@echo "      ASM $<" 
+	@echo "      ASM | $<" 
 	@$(ASM) $(ASM_FLAGS) -o $@ $<
 
 $(DIR_BUILD)/%.c.o: %.c
 	@mkdir -p $(dir $@)
-	@echo "        C $<" 
+	@echo "        C | $<" 
 	@$(CC) $(C_FLAGS) -c $< -o $@ 
 
 $(DIR_BUILD)/%.cpp.o: %.cpp
 	@mkdir -p $(dir $@)
-	@echo "      CPP $<" 
+	@echo "      CPP | $<" 
 	@$(CPP) $(CPP_FLAGS) -c $< -o $@ 
