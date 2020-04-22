@@ -30,7 +30,6 @@ void KernelLog::WriteString(const char* s) {
 }
 
 void KernelLog::Log(const char* category, const char* fmt, ...) {
-    // TODO: Hook up timing subsystem to kernel log output
     printf("%5s: ", category);
 
     va_list arg;

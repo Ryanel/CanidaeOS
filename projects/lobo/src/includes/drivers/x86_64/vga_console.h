@@ -15,4 +15,5 @@ class VGAConsoleDevice : public IKernelLogTerminalOutDevice {
     const int height = 25;
     int x = 0;
     int y = 0;
+    unsigned char attribute = 0x0F;
 };

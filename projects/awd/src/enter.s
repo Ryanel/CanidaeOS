@@ -11,7 +11,9 @@ align 8
 gdt64:
     dq 0 ; zero entry
 .code: equ $ - gdt64 ; new
-    dq (1<<43) | (1<<44) | (1<<47) | (1<<53) ; code segment
+    dq (1<<43) | (1<<44) | (1<<47) | (1<<53) ; Code Segment
+.data_seg: equ $ - gdt64
+    dq (1<<44) | (1<<47) | (1<<41)           ; Data segment
 .pointer:
     dw $ - gdt64 - 1
     dq gdt64

@@ -11,7 +11,8 @@ void VGAConsoleDevice::Init(int curX, int curY) {
 }
 
 void VGAConsoleDevice::PrintChar(const char c) {
-    char* buffer = (char*)(0xB8000);
+    char*        buffer = (char*)(0xB8000);
+    unsigned int offset = ((y * width) + x) * 2;
     switch (c) {
         case '\n':
             x = 0;
@@ -19,7 +20,8 @@ void VGAConsoleDevice::PrintChar(const char c) {
             break;
 
         default:
-            buffer[((y * width) + x) * 2] = c;
+            buffer[offset]     = c;
+            buffer[offset + 1] = attribute;
             x++;
             break;
     }
@@ -34,13 +36,25 @@ void VGAConsoleDevice::Clear() {
 }
 
 void VGAConsoleDevice::AttemptScroll() {
-    if(x >= width) {
+    if (x >= width) {
         y++;
         x = 0;
     }
 
-    if(y >= height) {
+    if (y >= height) {
         // Scroll
+
+        char*  buffer = (char*)(0xB8000);
+
+        for(int yi = 1; yi < height; yi++) {
+            for(int xi = 0; xi < width; xi++) {
+                unsigned int offsetI = ((yi * width) + xi) * 2;
+                unsigned int offsetP = (((yi - 1) * width) + xi) * 2;
+
+                buffer[offsetP] = buffer[offsetI];
+                buffer[offsetP + 1] = buffer[offsetI + 1];
+            }
+        }
         y--;
     }
 }
