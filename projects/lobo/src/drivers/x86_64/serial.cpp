@@ -1,11 +1,11 @@
-#include "drivers/x86_64/serial.h"
+#include "drivers/x86_64/uart.h"
 
 #include <stddef.h>
 #include <stdint.h>
 
 #include "x86_64/ports.h"
 
-void SerialDevice::PrintChar(const char c) {
+void UARTLoggingDevice::PrintChar(const char c) {
     const uint16_t port = 0x3f8;
     if (!deviceInit) {
         outb(port + 1, 0x00);
@@ -24,4 +24,8 @@ void SerialDevice::PrintChar(const char c) {
 
     // Always print a carridge return on newline
     if (c == '\n') { PrintChar('\r'); }
+}
+
+void UARTLoggingDevice::Clear() {
+    // TODO: Implement
 }

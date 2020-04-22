@@ -3,7 +3,6 @@ bits 64
 ; First thread stack
 ; -----------------------------------------------------------------------------
 section .bss
-
 align 16
 stack_bottom:
     resb 16384 ; 16KB of Stack

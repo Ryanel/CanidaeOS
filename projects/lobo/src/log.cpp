@@ -7,14 +7,20 @@
 static KernelLog kernel_log;
 
 KernelLog& KernelLog::Get() { return kernel_log; }
+void KernelLog::SetSerialLogging(IKernelLogTerminalOutDevice* device) { serialOutDevice = device; }
+void KernelLog::SetTerminalDevice(IKernelLogTerminalOutDevice* device) { terminalOutDevice = device; }
 
 void KernelLog::WriteChar(const char c) {
+    // Store written character to backing store
+    if (m_backingStore) {}
+    
     // Write to serial out
     if (serialOutDevice != nullptr) { serialOutDevice->PrintChar(c); }
 
-    // Store written character to backing store
-    if (m_backingStore) {}
+    // Write to screen
+    if (terminalOutDevice != nullptr) { terminalOutDevice->PrintChar(c); }
 }
+
 void KernelLog::WriteString(const char* s) {
     size_t i = 0;
     while (s[i] != '\0') {
@@ -22,7 +28,6 @@ void KernelLog::WriteString(const char* s) {
         i++;
     }
 }
-void KernelLog::SetSerialLogging(IKernelLogSerialOutDevice* device) { serialOutDevice = device; }
 
 void KernelLog::Log(const char* category, const char* fmt, ...) {
     // TODO: Hook up timing subsystem to kernel log output
