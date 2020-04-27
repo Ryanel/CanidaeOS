@@ -44,17 +44,27 @@ extern "C" void fault_handler(struct InterruptContext* r) {
     // KernelLog::Get().Log("int", "Caught an interrupt! %d, error %p", r->int_no, r->err_code);
 
     if (r->int_no < 32) {
-        log.Log("int", "       Exception | %s (%d)", exception_strings[r->int_no], r->int_no);
-        log.Log("int", "      Error Code | 0x%016p", r->err_code);
-        log.Log("int", "Faulting Address | 0x%016p", r->rip);
-        log.Log("int", "             RSP | 0x%016p", r->userrsp);
+        log.LogRaw("%35sException\n","");
+        log.Log("fault", "%s (int %d), Error Code: 0x%08x", exception_strings[r->int_no], r->int_no, (uint32_t)r->err_code);
+        log.Log("fault", "RBP: 0x%016p RSP: 0x%016p RIP: 0x%016p", r->rbp, r->userrsp, r->rip);
+        log.Log("fault", "RAX: 0x%016p RBX: 0x%016p RCX: 0x%016p", r->rax, r->rbx, r->rcx);
+        log.Log("fault", "RDX: 0x%016p RDI: 0x%016p RSI: 0x%016p", r->rdx, r->rdi, r->rsi);
+        log.Log("fault", " R8: 0x%016p  R9: 0x%016p R10: 0x%016p", r->r8, r->r9, r->r10);
+        log.Log("fault", "R11: 0x%016p R12: 0x%016p R13: 0x%016p", r->r11, r->r12, r->r13);
+        log.Log("fault", "R14: 0x%016p R15: 0x%016p", r->r14, r->r15);
+
         asm("hlt");
     }
 }
 
 extern "C" void interrupt_handler(struct InterruptContext* r) {
     auto& log = KernelLog::Get();
-    // log.Log("int", "Recieved IRQ %d, handled.", (r->int_no - 32));
+
+    // Print out any IRQ that's not IRQ 0
+    if(r->int_no != 32) { 
+        log.Log("int", "Recieved IRQ %d, handled.", (r->int_no - 32));
+    }
+
     // End of Interrupt to PIC (and slave)
     if (r->int_no >= 40) { outb(0xA0, 0x20); }
     outb(0x20, 0x20);
@@ -90,7 +100,7 @@ void init_idt() {
     outb(0x21, 0x0);
     outb(0xA1, 0x0);
 
-    // ISR's
+    // ISR's -------------------------------------------------------------------
     table_idt[0]  = idt_populate_entry((uint64_t)(&interrupt_isr0), 0x08, 0x8E);
     table_idt[1]  = idt_populate_entry((uint64_t)(&interrupt_isr1), 0x08, 0x8E);
     table_idt[2]  = idt_populate_entry((uint64_t)(&interrupt_isr2), 0x08, 0x8E);
@@ -124,7 +134,7 @@ void init_idt() {
     table_idt[30] = idt_populate_entry((uint64_t)(&interrupt_isr30), 0x08, 0x8E);
     table_idt[31] = idt_populate_entry((uint64_t)(&interrupt_isr31), 0x08, 0x8E);
 
-    // IRQ's
+    // IRQ's --------------------------------------------------------------------
     table_idt[32] = idt_populate_entry((uint64_t)(&interrupt_irq0), 0x08, 0x8E);
     table_idt[33] = idt_populate_entry((uint64_t)(&interrupt_irq1), 0x08, 0x8E);
     table_idt[34] = idt_populate_entry((uint64_t)(&interrupt_irq2), 0x08, 0x8E);
@@ -146,4 +156,5 @@ void init_idt() {
     table_idt_ptr.address = (uint64_t)(&table_idt);
     table_idt_ptr.limit   = (sizeof(idt_table_entry_t) * 256) - 1;
     interrupt_set_idt((uint64_t)(&table_idt_ptr));
+    asm("sti"); // Start interrupts
 }

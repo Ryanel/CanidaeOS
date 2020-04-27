@@ -16,7 +16,7 @@ class KernelLog {
     void              SetSerialLogging(IKernelLogTerminalOutDevice* device);
     void              SetTerminalDevice(IKernelLogTerminalOutDevice* device);
     void              Log(const char* category, const char* fmt, ...);
-
+    void              LogRaw(const char* fmt, ...);
    private:
     IKernelLogTerminalOutDevice* serialOutDevice   = nullptr;
     IKernelLogTerminalOutDevice* terminalOutDevice = nullptr;

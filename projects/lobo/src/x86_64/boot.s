@@ -29,26 +29,20 @@ global _start
 extern kernel_entry
 
 _start:
-    mov     rsp, stack_top          ; Setup Stack
-    mov     rbp, stack_top
-    
-    mov rdi, rbx
-
-    ; Switch
-    lgdt [gdt64.pointer] ; CS should still be 0x08
-
-    ; Load Data Segment...
-    push rax
+    mov     rsp, stack_top      ; Setup Stack
+    mov     rbp, stack_top 
+    mov rdi, rbx                ; Set the first argument for kernel_entry to
+                                ; the struct passed by awd_info
+    lgdt [gdt64.pointer]        ; Switch GDT, CS should still be 0x08
+    push rax                    ; Switch segments
     mov ax, 0x10
     mov ss, ax
     mov ds, ax
     mov es, ax
     mov fs, ax
     mov gs, ax
-    pop rax
-
-    ; Call
-    call kernel_entry
+    pop rax                     ; Restore state.
+    call kernel_entry           ; Enter the kernel!
 .loop:
     cli
     hlt

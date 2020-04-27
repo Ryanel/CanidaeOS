@@ -7,15 +7,17 @@ LINK_FLAGS :=
 LINK_POST_FLAGS := -lgcc
 ASM_FLAGS := -felf64
 
-WARNING_FLAGS := -Wall -Wextra -Wfloat-equal -Wundef -Wcast-align -Wwrite-strings -Wlogical-op -Wredundant-decls -Wshadow 
-SHARED_FLAGS := -m64 -ffreestanding -O1 -g -fno-omit-frame-pointer -nostdlib \
--z max-page-size=0x1000 -mcmodel=kernel -mno-red-zone -mno-mmx -mno-sse -mno-sse2 -Isrc/includes/ $(WARNING_FLAGS)
+WARNING_FLAGS := -Wall -Wextra -Wfloat-equal -Wundef -Wcast-align -Wwrite-strings -Wlogical-op -Wredundant-decls -Wshadow
+FEATURE_FLAGS := -mno-red-zone -mno-mmx -mno-sse -mno-sse2 -fno-omit-frame-pointer 
+SHARED_FLAGS := -m64 -ffreestanding -mcmodel=kernel -O2 -g  \
+-z max-page-size=0x1000 -Isrc/includes/ $(FEATURE_FLAGS) $(WARNING_FLAGS) -nostdlib
+
 C_FLAGS := $(SHARED_FLAGS) 
 CPP_FLAGS := $(SHARED_FLAGS) -fno-exceptions -fno-rtti  -Woverloaded-virtual
 
 # Compilers
 ASM := nasm
-CC := x86_64-elf-gcc
+CC  := x86_64-elf-gcc
 CPP := x86_64-elf-g++
 
 # Files

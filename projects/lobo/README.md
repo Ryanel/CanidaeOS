@@ -1,2 +1,23 @@
 # Lobo Kernel
 
+Lobo is a pure 64-bit hybrid kernel. Most services will run in Userspace.
+
+## Features
+* Boots from AWD in 64-bit mode.
+* VGA Output
+* Serial Output
+* Logging Facilities
+* x86_64: GDT
+* x86_64: IDT
+
+### To-do
+* Physical Memory Manager
+* Virtual Memory Manager
+* Module Loader
+* Message Passing System
+* PCI
+* Timing Subsystem
+* Processes
+* Process Scheduling
+* Multiprocessor Support
+* VFS

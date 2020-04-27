@@ -11,12 +11,13 @@ void KernelLog::SetSerialLogging(IKernelLogTerminalOutDevice* device) { serialOu
 void KernelLog::SetTerminalDevice(IKernelLogTerminalOutDevice* device) { terminalOutDevice = device; }
 
 void KernelLog::WriteChar(const char c) {
-    // Store written character to backing store
-    if (m_backingStore) {}
-    
     // Write to serial out
     if (serialOutDevice != nullptr) { serialOutDevice->PrintChar(c); }
 
+    // Store written character to a backing store
+    // TODO: Implement
+    if (m_backingStore) {}
+    
     // Write to screen
     if (terminalOutDevice != nullptr) { terminalOutDevice->PrintChar(c); }
 }
@@ -30,7 +31,7 @@ void KernelLog::WriteString(const char* s) {
 }
 
 void KernelLog::Log(const char* category, const char* fmt, ...) {
-    printf("%5s: ", category);
+    printf("%6s: ", category);
 
     va_list arg;
     va_start(arg, fmt);
@@ -38,4 +39,11 @@ void KernelLog::Log(const char* category, const char* fmt, ...) {
     va_end(arg);
 
     WriteChar('\n');
+}
+
+void KernelLog::LogRaw(const char* fmt, ...) {
+    va_list arg;
+    va_start(arg, fmt);
+    vprintf(fmt, arg);
+    va_end(arg);
 }

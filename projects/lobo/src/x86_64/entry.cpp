@@ -8,25 +8,30 @@
 #include "kernel/log.h"
 #include "x86_64/interrupts.h"
 
+void kernel_main();
+void kernel_version_print();
+
 UARTLoggingDevice boot_serial_logger_device;
 VGAConsoleDevice  boot_vga_console_device;
 
-extern "C" int kernel_entry(awd_info_t* awd_info) {
+extern "C" void kernel_entry(awd_info_t* awd_info) {
     awd_info        = awd_info;
     auto& kernelLog = KernelLog::Get();
 
+    // Architecture specific setup
+    // Start VGA and Logging
     boot_vga_console_device.Init(0, awd_info->log_cursor_y);
-
     kernelLog.SetSerialLogging(&boot_serial_logger_device);
     kernelLog.SetTerminalDevice(&boot_vga_console_device);
 
-    kernelLog.Log("lobo", "Lobo Kernel (v 0.0.0.1)");
+    // Print the kernel version
+    kernel_version_print();
 
-    kernelLog.Log("int", "Initialising x86 IDT");
+    // Interrupts
+    kernelLog.Log("int", "Initialising interrupts");
     init_idt();
-    asm("sti");
+    kernelLog.Log("int", "Interrupts enabled");
 
-    kernelLog.Log("lobo", "Finished, idling.");
-
-    while (true) { asm("hlt"); }
+    // Architecture specific setup finished, boot into kernel main...
+    kernel_main();
 }
