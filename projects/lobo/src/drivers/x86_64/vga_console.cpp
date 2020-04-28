@@ -43,7 +43,6 @@ void VGAConsoleDevice::AttemptScroll() {
 
     if (y >= height) {
         // Scroll
-
         char*  buffer = (char*)(0xB8000);
 
         for(int yi = 1; yi < height; yi++) {
@@ -56,5 +55,11 @@ void VGAConsoleDevice::AttemptScroll() {
             }
         }
         y--;
+
+        int yi = height - 1;
+        for(int xi = 0; xi < width; xi++) {
+            unsigned int offsetI = ((yi * width) + xi) * 2;
+             buffer[offsetI] = ' ';
+        }
     }
 }

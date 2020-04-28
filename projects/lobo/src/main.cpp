@@ -3,23 +3,23 @@
 #include "stdio.h"
 
 #include "kernel/log.h"
+#include "kernel/pmm.h"
+#include "kernel/cpu.h"
+
+using namespace Kernel;
 
 void kernel_idle_thread() {
     auto& kLog = KernelLog::Get();
-
     kLog.Log("lobo", "Entered Kernel Idle Thread");
-
-    while (true) {}
+    CPU::IdleLoop();
 }
 
 void kernel_main() {
     auto& kLog = KernelLog::Get();
     
     kLog.Log("lobo", "Entered Kernel Main");
-    
-    uint8_t * cause_pf = (uint8_t *)0xA000000;
-
-    cause_pf[12] = 0xA;
+    auto& kernelPmm =  Kernel::PMM::Get();
+    kernelPmm.DebugPrintFreePages();
 
     kernel_idle_thread();
 }

@@ -7,13 +7,14 @@
 #define AWD_MEMMAP_USED 1
 
 typedef struct AWDPhysmemmap {
-    char                  type;
-    uint64_t              startAddress;
-    uint64_t              size;
-    struct AWDPhysmemmap* next;
+    uint32_t next;
+    char     type;
+    uint32_t startAddress_hi;
+    uint32_t startAddress_lo;
+    uint64_t size;
 } awd_physmemmap_t;
 
 void              memmap_phys_add(awd_physmemmap_t* x);
-awd_physmemmap_t* memmap_phys_create(char type, uint64_t startAddress, uint64_t size);
+awd_physmemmap_t* memmap_phys_create(char type, uint32_t startAddress_lo, uint32_t startAddress_hi, uint64_t size);
 awd_physmemmap_t* memmap_phys_get_root();
 #endif

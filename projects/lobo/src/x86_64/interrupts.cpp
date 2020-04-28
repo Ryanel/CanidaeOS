@@ -1,9 +1,9 @@
 #include "x86_64/interrupts.h"
 #include <string.h>
 #include "kernel/log.h"
+#include "kernel/cpu.h"
 #include "x86_64/interrupt_methods.h"
 #include "x86_64/ports.h"
-
 idt_table_entry_t table_idt[256] __attribute__((aligned(0x1000)));
 idt_table_ptr_t   table_idt_ptr;
 
@@ -53,8 +53,17 @@ extern "C" void fault_handler(struct InterruptContext* r) {
         log.Log("fault", "R11: 0x%016p R12: 0x%016p R13: 0x%016p", r->r11, r->r12, r->r13);
         log.Log("fault", "R14: 0x%016p R15: 0x%016p", r->r14, r->r15);
 
-        asm("hlt");
+        if(r->int_no == 14) {
+            // Page fault
+            uint64_t faultingAddress;
+            asm volatile("mov %%cr2, %0" : "=r" (faultingAddress));
+            log.Log("fault", "Faulting address: 0x%016p\n", faultingAddress);
+        }
+
+        Kernel::CPU::HaltCPU();
     }
+
+    
 }
 
 extern "C" void interrupt_handler(struct InterruptContext* r) {
@@ -78,9 +87,9 @@ idt_table_entry_t idt_populate_entry(uint64_t entry, uint16_t cs_selector, uint8
     idt_entry.offset_hi   = (entry & 0xFFFFFFFF00000000) >> 32;
     idt_entry.cs_selector = cs_selector;
     idt_entry.attributes  = attributes;
-
-    idt_entry.zero_2 = 0;
-    idt_entry.ist    = 0;
+    // Already memset to zero
+    //idt_entry.zero_2 = 0; 
+    //idt_entry.ist    = 0;
     return idt_entry;
 }
 

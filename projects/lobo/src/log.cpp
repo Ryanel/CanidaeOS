@@ -31,13 +31,15 @@ void KernelLog::WriteString(const char* s) {
 }
 
 void KernelLog::Log(const char* category, const char* fmt, ...) {
-    printf("%6s: ", category);
-
     va_list arg;
     va_start(arg, fmt);
-    vprintf(fmt, arg);
+    LogArg(category, fmt, arg);
     va_end(arg);
+}
 
+void KernelLog::LogArg(const char* category, const char* fmt, va_list arg) {
+    printf("%6s: ", category);
+    vprintf(fmt, arg);
     WriteChar('\n');
 }
 

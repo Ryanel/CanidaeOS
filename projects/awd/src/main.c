@@ -76,7 +76,7 @@ void find_memory() {
         console_print_uint64(end_addr);
         console_printchar('\n');
 
-        memmap_phys_add(memmap_phys_create(type, addr, mapping->len));
+        memmap_phys_add(memmap_phys_create(type, (uint32_t)(addr & 0xFFFFFFFF),(uint32_t)(addr & 0xFFFFFFFF00000000), mapping->len));
     }
 }
 
@@ -109,9 +109,8 @@ void awd_main(uint32_t mb_magic) {
     // Execute the kernel
     console_log("awd", "Entering 64-bit longmode and executing the kernel\n");
 
-    k_ptr = kernel.virt_entry;
-
     // Write configuration
+    k_ptr = kernel.virt_entry;
     awd_boot_info.numCPUs          = 1;
     awd_boot_info.ptr_phys_mem_map = (uint32_t)memmap_phys_get_root();
     awd_boot_info.multiboot_struct = (uint32_t)multiboot_struct_ptr;
@@ -120,6 +119,5 @@ void awd_main(uint32_t mb_magic) {
     awd_boot_info.log_cursor_y     = console_getY();
 
     enter_kernel(kernel.virt_entry);
-
     panic("Exited early");
 }
