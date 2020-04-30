@@ -7,4 +7,7 @@ void* malloc_aligned(unsigned int size, unsigned int alignment);
 void* malloc(unsigned int size);
 void* malloc_page(unsigned int size);
 
+uintptr_t malloc_get_current();
+uintptr_t malloc_get_limit();
+
 #endif

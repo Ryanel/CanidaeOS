@@ -2,28 +2,44 @@ ENTRY (_start)
 
 SECTIONS
 {
-	KERNEL_VMA = 0xFFFFFFFFF8000000;
+	KERNEL_VMB = 0xFFFFFFFFF8000000;
+	KERNEL_VMA = KERNEL_VMB + 0x200000;
 	. = KERNEL_VMA;
-	/* Add a symbol that indicates the start address of the kernel. */
+
 	_kernel_start = .;
-	.text ALIGN (4K) : AT (ADDR (.text) - KERNEL_VMA)
+	
+	.text ALIGN (0x1000) : AT (ADDR (.text) - KERNEL_VMA)
 	{
+		_kernel_ro_start = .;
 		*(.text)
 	}
-	.rodata ALIGN (4K) : AT (ADDR (.rodata) - KERNEL_VMA)
+	.rodata ALIGN (0x1000) : AT (ADDR (.rodata) - KERNEL_VMA)
 	{
 		*(.rodata)
 	}
-	.data ALIGN (4K) : AT (ADDR (.data) - KERNEL_VMA)
+
+	.data ALIGN (0x1000) : AT (ADDR (.data) - KERNEL_VMA)
 	{
+		_kernel_ro_end = .;
+		_kernel_data_start = .;
 		*(.data)
+		*(.ctor*)
+        *(.dtor*)
 	}
-	.bss ALIGN (4K) : AT (ADDR (.bss) - KERNEL_VMA)
+	.bss ALIGN (0x1000) : AT (ADDR (.bss) - KERNEL_VMA)
 	{
 		*(COMMON)
 		*(.bss)
 		*(.bootstrap_stack)
 	}
 
+	.ehframe ALIGN (0x1000) : AT(ADDR(.ehframe) - KERNEL_VMA)
+    {
+        ehframe = .;
+        *(.ehframe)
+        . = ALIGN(4096);
+    }
+
+	_kernel_data_end = .;
 	_kernel_end = .;
 }

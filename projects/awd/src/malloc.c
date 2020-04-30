@@ -10,6 +10,14 @@ uintptr_t malloc_base    = 0x200000;
 uintptr_t malloc_current = 0x200000;
 uintptr_t malloc_limit   = 0x400000;
 
+uintptr_t malloc_get_current() {
+    return malloc_current;
+}
+
+uintptr_t malloc_get_limit() {
+    return malloc_limit;
+}
+
 void init_malloc(uintptr_t base, uintptr_t limit) {
     malloc_current = base;
     malloc_base    = base;

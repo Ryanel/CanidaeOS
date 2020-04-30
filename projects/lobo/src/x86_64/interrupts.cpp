@@ -4,6 +4,7 @@
 #include "kernel/cpu.h"
 #include "x86_64/interrupt_methods.h"
 #include "x86_64/ports.h"
+
 idt_table_entry_t table_idt[256] __attribute__((aligned(0x1000)));
 idt_table_ptr_t   table_idt_ptr;
 
@@ -94,6 +95,8 @@ idt_table_entry_t idt_populate_entry(uint64_t entry, uint16_t cs_selector, uint8
 }
 
 void init_idt() {
+    auto& kernelLog = KernelLog::Get();
+    kernelLog.Log("int", "Initialising interrupts");
     // Fill with non-present data
     memset(&table_idt, 0, sizeof(idt_table_entry_t) * 256);
 
@@ -165,5 +168,8 @@ void init_idt() {
     table_idt_ptr.address = (uint64_t)(&table_idt);
     table_idt_ptr.limit   = (sizeof(idt_table_entry_t) * 256) - 1;
     interrupt_set_idt((uint64_t)(&table_idt_ptr));
+
+    kernelLog.Log("int", "Interrupts enabled");
+    
     asm("sti"); // Start interrupts
 }

@@ -11,7 +11,7 @@ namespace Kernel {
     
 class PMM {
     bool hasBeenInitialised = false;
-    uint8_t bitmap[0x20000];
+    uint8_t * bitmap;
     uint64_t numPages;
    public:
     void Init(uint64_t numPages);

@@ -1,5 +1,6 @@
 #pragma once
 #include "kernel/log.h"
+#include <stdint.h>
 
 class VGAConsoleDevice : public IKernelLogTerminalOutDevice {
    public:
@@ -11,6 +12,7 @@ class VGAConsoleDevice : public IKernelLogTerminalOutDevice {
     void AttemptScroll();
 
    private:
+    uint64_t bufferAddr;
     const int width = 80;
     const int height = 25;
     int x = 0;

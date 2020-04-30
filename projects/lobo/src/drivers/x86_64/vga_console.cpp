@@ -4,14 +4,17 @@
 #include <stdint.h>
 
 #include "x86_64/ports.h"
+#include "kernel/kernel.h"
+
 
 void VGAConsoleDevice::Init(int curX, int curY) {
     x = curX;
     y = curY;
+    bufferAddr = MEM_PHYS_TO_VIRT(0xB8000); // TODO: Convert to virtual
 }
 
 void VGAConsoleDevice::PrintChar(const char c) {
-    char*        buffer = (char*)(0xB8000);
+    char*        buffer = (char*)(bufferAddr);
     unsigned int offset = ((y * width) + x) * 2;
     switch (c) {
         case '\n':
@@ -43,7 +46,7 @@ void VGAConsoleDevice::AttemptScroll() {
 
     if (y >= height) {
         // Scroll
-        char*  buffer = (char*)(0xB8000);
+        char*  buffer = (char*)(bufferAddr);
 
         for(int yi = 1; yi < height; yi++) {
             for(int xi = 0; xi < width; xi++) {

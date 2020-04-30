@@ -76,14 +76,15 @@ void find_memory() {
         console_print_uint64(end_addr);
         console_printchar('\n');
 
-        memmap_phys_add(memmap_phys_create(type, (uint32_t)(addr & 0xFFFFFFFF),(uint32_t)(addr & 0xFFFFFFFF00000000), mapping->len));
+        memmap_phys_add(memmap_phys_create(type, (uint32_t)(addr & 0xFFFFFFFF), (uint32_t)(addr & 0xFFFFFFFF00000000),
+                                           mapping->len));
     }
 }
 
 void awd_main(uint32_t mb_magic) {
     // Initialise the console
     console_init();
-    console_log("awd", "African Wild Dog Loader [v 0.0.0.1]\n");
+    console_log("awd", "African Wild Dog Loader [v 0.0.0.2]\n");
 
     // Check to make sure we booted successfully
     if (mb_magic != 0x2BADB002) { panic("Multiboot magic was incorrect"); }
@@ -93,13 +94,18 @@ void awd_main(uint32_t mb_magic) {
 
     // Find the malloc region (another 2MB)
     init_malloc(0x200000, 0x400000);
+    
+    // Map the next 2MB, for use by the kernel's initial page mapping code.
     paging_map_region(0x200000, 0x400000, 0x200000, 0x400000);
+    paging_map_region(0x200000, 0x400000, (0xFFFFFFFFF8000000 + 0x200000), (0xFFFFFFFFF8000000 + 0x400000));
 
     // Load kernel
     loaded_kernel_info_t kernel = awd_load();
 
     // Identity map the first 2 MB, then commit
     paging_map_region(0, 0x200000, 0, 0x200000);
+    paging_map_region(0, 0x200000, (0xFFFFFFFFF8000000 + 0x000000), (0xFFFFFFFFF8000000 + 0x200000));
+
     paging_commit();
 
     // Parse memory map...
@@ -110,14 +116,15 @@ void awd_main(uint32_t mb_magic) {
     console_log("awd", "Entering 64-bit longmode and executing the kernel\n");
 
     // Write configuration
-    k_ptr = kernel.virt_entry;
-    awd_boot_info.numCPUs          = 1;
-    awd_boot_info.ptr_phys_mem_map = (uint32_t)memmap_phys_get_root();
-    awd_boot_info.multiboot_struct = (uint32_t)multiboot_struct_ptr;
-    awd_boot_info.kernel_phstart   = kernel.phys_start;
-    awd_boot_info.kernel_phsize    = kernel.phys_size;
-    awd_boot_info.log_cursor_y     = console_getY();
-
+    k_ptr                            = kernel.virt_entry;
+    awd_boot_info.numCPUs            = 1;
+    awd_boot_info.ptr_phys_mem_map   = (uint32_t)memmap_phys_get_root();
+    awd_boot_info.multiboot_struct   = (uint32_t)multiboot_struct_ptr;
+    awd_boot_info.kernel_phstart     = kernel.phys_start;
+    awd_boot_info.kernel_phsize      = kernel.phys_size;
+    awd_boot_info.log_cursor_y       = console_getY();
+    awd_boot_info.ptr_malloc_current = malloc_get_current();
+    awd_boot_info.ptr_malloc_limit   = malloc_get_limit();
     enter_kernel(kernel.virt_entry);
     panic("Exited early");
 }

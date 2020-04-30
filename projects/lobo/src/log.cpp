@@ -13,7 +13,6 @@ void KernelLog::SetTerminalDevice(IKernelLogTerminalOutDevice* device) { termina
 void KernelLog::WriteChar(const char c) {
     // Write to serial out
     if (serialOutDevice != nullptr) { serialOutDevice->PrintChar(c); }
-
     // Store written character to a backing store
     // TODO: Implement
     if (m_backingStore) {}
@@ -38,7 +37,7 @@ void KernelLog::Log(const char* category, const char* fmt, ...) {
 }
 
 void KernelLog::LogArg(const char* category, const char* fmt, va_list arg) {
-    printf("%6s: ", category);
+    printf("%10s | ", category);
     vprintf(fmt, arg);
     WriteChar('\n');
 }

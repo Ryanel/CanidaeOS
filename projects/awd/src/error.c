@@ -8,6 +8,8 @@
 
 void panic(const char* s) {
     console_log("panic", s);
+    
+    console_printchar('\n');
 
     while (1) {
         asm("cli");

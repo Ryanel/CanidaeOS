@@ -27,14 +27,15 @@ gdt64:
 section .text
 global _start
 extern kernel_entry
+extern _init
 
 _start:
     mov     rsp, stack_top      ; Setup Stack
     mov     rbp, stack_top 
     mov rdi, rbx                ; Set the first argument for kernel_entry to
                                 ; the struct passed by awd_info
-    lgdt [gdt64.pointer]        ; Switch GDT, CS should still be 0x08
-    push rax                    ; Switch segments
+    lgdt [gdt64.pointer]        ; Switch GDT
+    push rax                    ; Switch segments, CS should still be 0x08
     mov ax, 0x10
     mov ss, ax
     mov ds, ax
@@ -42,6 +43,9 @@ _start:
     mov fs, ax
     mov gs, ax
     pop rax                     ; Restore state.
+    push rdi
+    call _init                  ; Now, call init!
+    pop rdi
     call kernel_entry           ; Enter the kernel!
 .loop:
     cli

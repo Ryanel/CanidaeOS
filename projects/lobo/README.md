@@ -9,10 +9,10 @@ Lobo is a pure 64-bit hybrid kernel. Most services will run in Userspace.
 * Logging Facilities
 * x86_64: GDT
 * x86_64: IDT
+* Physical Memory Manager
+* Virtual Memory Manager (in progress)
 
 ### To-do
-* Physical Memory Manager
-* Virtual Memory Manager
 * Module Loader
 * Message Passing System
 * PCI
