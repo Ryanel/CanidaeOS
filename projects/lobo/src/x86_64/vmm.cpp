@@ -38,26 +38,23 @@ void VMM::SetupKernelPageTable(awd_info_t* awd_info) {
     kernelP4 = (page_table_t*)kmalloc_aligned(0x1000, 0x1000);
     memset(kernelP4, 0, PAGE_SIZE);
 
-    uint8_t flags = (VMM_PAGE_PRESENT | VMM_PAGE_WRITE);
+    const uint8_t flags = (VMM_PAGE_PRESENT | VMM_PAGE_WRITE);
 
-    // MapPages(kernelP4, 0x0, 0x0, 0x200000, (VMM_PAGE_PRESENT | VMM_PAGE_WRITE));
-    MapPages(kernelP4, 0xfffffffff8000000, MEM_VIRT_TO_PHYS(0xfffffffff8000000), 0x200000, flags);  /// 2->4 mb
-    MapPages(kernelP4, 0xfffffffff8200000, MEM_VIRT_TO_PHYS(0xfffffffff8200000), 0x200000, flags);  // 4mb -> 6mb
-    MapPages(kernelP4, 0xfffffffff8400000, MEM_VIRT_TO_PHYS(0xfffffffff8400000), 0x400000, flags);  // First two megabytes
+    MapPages(kernelP4, 0xfffffffff8000000, MEM_VIRT_TO_PHYS(0xfffffffff8000000), 0x200000, flags);  // 0MB -> 2MB
+    MapPages(kernelP4, 0xfffffffff8200000, MEM_VIRT_TO_PHYS(0xfffffffff8200000), 0x200000, flags);  // 2MB -> 4MB
 
-    uint64_t addressOfP4 = MEM_VIRT_TO_PHYS((uint64_t)kernelP4);
-    
+    physical_addr_t addressOfP4 = MEM_VIRT_TO_PHYS((physical_addr_t)kernelP4);
+
     asm volatile("movq %0, %%cr3;" ::"r"(addressOfP4));
 
     VMM_DEBUG_LOG("Switched to Kernel Page Table 0x%016p", kernelP4);
-
-    // VMM_DEBUG_LOG("Switched to Kernel Page Table 0x%016p", kernelP4->entries[30]);
 }
 
 page_entry_t* VMM::FindEntry(page_table_t* p4, logical_addr_t addr, bool create) {
     page_table_t* p3 = nullptr;
     page_table_t* p2 = nullptr;
     page_table_t* p1 = nullptr;
+
     // Step 1: Determine offsets into tables...
     uintptr_t index_p4 = (addr >> 39) & 511;  // PML4 index
     uintptr_t index_p3 = (addr >> 30) & 511;  // PDPT index
@@ -82,8 +79,10 @@ page_entry_t* VMM::FindEntry(page_table_t* p4, logical_addr_t addr, bool create)
     // Step 5: Locate the entry in the page table
     uint64_t ent_address = (uint64_t)(&(p1->entries[index_p1]));
     auto     res         = (page_entry_t*)ent_address;
+
     // VMM_DEBUG_LOG("walk 4[%03d]-> 3[%03d]-> 2[%03d]-> 1[%03d] @ 0x%016p", index_p4, index_p3, index_p2, index_p1,
     // res);
+
     return res;
 }
 

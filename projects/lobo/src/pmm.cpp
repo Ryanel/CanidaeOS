@@ -2,10 +2,10 @@
 #include <stdint.h>
 #include "stdio.h"
 
+#include "kernel/heap.h"
 #include "kernel/log.h"
 #include "kernel/panic.h"
 #include "kernel/pmm.h"
-#include "kernel/heap.h"
 
 using namespace Kernel;
 
@@ -23,7 +23,7 @@ void PMM::Init(uint64_t num) {
     for (size_t i = 0; i < numPages; i++) { SetPage(i * 0x1000); }
 }
 
-uint64_t PMM::Allocate(uint64_t n) {
+uint64_t PMM::Allocate(uint64_t numContiguous) {
     uint64_t idx = 0;
 
     while (idx < numPages) {
@@ -32,14 +32,14 @@ uint64_t PMM::Allocate(uint64_t n) {
             // We have a starting point for a free address!
 
             // Simple case, just use and return this address
-            if (n <= 1) {
+            if (numContiguous <= 1) {
                 SetPage(init_address);
                 return init_address;
             }
 
             // Otherwise, check the next pages if they're free
             bool allWasFree = true;
-            for (unsigned int checkIndex = idx + 1; checkIndex < idx + n; checkIndex++) {
+            for (unsigned int checkIndex = idx + 1; checkIndex < idx + numContiguous; checkIndex++) {
                 if (TestPage(checkIndex * 0x1000) == true) {
                     allWasFree = false;
                     break;
@@ -47,16 +47,15 @@ uint64_t PMM::Allocate(uint64_t n) {
             }
 
             if (allWasFree) {
-                for (unsigned int k = idx; k < idx + n; k++) { SetPage(k * 0x1000); }
+                for (unsigned int k = idx; k < idx + numContiguous; k++) { SetPage(k * 0x1000); }
                 return init_address;
             }
         }
         idx++;
     }
 
-    KernelLog::Get().Log("pmm", "Out of memory, no physical fragment of size %d", n);
+    //KernelLog::Get().Log("pmm", "Out of memory, no physical fragment of size %d", numContiguous);
     panic("PMM Out of Memory");
-
     return 0;
 }
 
@@ -97,6 +96,6 @@ void PMM::DebugPrintFreePages() {
     uint64_t pagesUsed = numPages - numFreePages;
 
     kLog.Log("pmm", "%d/%d pages free", numFreePages, numPages);
-    kLog.Log("pmm", "Used %dKB / %dKB of memory (%dMB / %dMB)", pagesUsed * 4, numPages * 4, (pagesUsed * 4) / 1024, (numPages * 4) / 1024);
-    
+    kLog.Log("pmm", "Used %dKB / %dKB of memory (%dMB / %dMB)", pagesUsed * 4, numPages * 4, (pagesUsed * 4) / 1024,
+             (numPages * 4) / 1024);
 }

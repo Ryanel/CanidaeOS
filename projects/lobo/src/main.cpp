@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stddef.h>
 #include <stdint.h>
 #include "stdio.h"
@@ -23,6 +24,8 @@ void kernel_main() {
     kLog.Log("lobo", "Entered Kernel Main");
 
     kernelPmm.DebugPrintFreePages();
+    
+    ASSERT(1 == 0);
 
     kernel_idle_thread();
 }

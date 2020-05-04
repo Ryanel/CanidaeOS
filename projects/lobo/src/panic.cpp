@@ -2,7 +2,6 @@
 #include "kernel/log.h"
 #include "kernel/cpu.h"
 
-
 void panic(const char* fmt, ...) {
     va_list arg;
 
@@ -12,3 +11,12 @@ void panic(const char* fmt, ...) {
     
     Kernel::CPU::HaltCPU();
 }
+
+#if DEBUG
+
+void _assert(const char * expression, const char * file, const char * function, int line) {
+    KernelLog::Get().Log("assert", "\"%s\" failed in file %s on line %d in function \"%s\"", expression, file, line, function);
+    panic("Assertion failed");
+}
+
+#endif

@@ -8,7 +8,8 @@
 #define PMM_NUM_BITMAPS 4
 
 namespace Kernel {
-    
+
+/// The Physical Memory Manager
 class PMM {
     bool hasBeenInitialised = false;
     uint8_t * bitmap;

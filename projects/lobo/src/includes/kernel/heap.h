@@ -3,6 +3,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
+/// Init Heap
 void heap_early_init(uintptr_t base, uintptr_t limit);
 void heap_init_full();
 
