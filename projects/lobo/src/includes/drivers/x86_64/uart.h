@@ -6,4 +6,8 @@ class UARTLoggingDevice : public IKernelLogTerminalOutDevice {
     bool deviceInit = false;
     void PrintChar(const char c);
     void Clear();
+    void FormatSetLeftColumn(int column);
+
+    private:
+    int leftColumn = 0;
 };

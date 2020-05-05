@@ -7,18 +7,19 @@
 static KernelLog kernel_log;
 
 KernelLog& KernelLog::Get() { return kernel_log; }
-void KernelLog::SetSerialLogging(IKernelLogTerminalOutDevice* device) { serialOutDevice = device; }
-void KernelLog::SetTerminalDevice(IKernelLogTerminalOutDevice* device) { terminalOutDevice = device; }
+
+void KernelLog::SetSerialLogging(IKernelLogTerminalOutDevice* device) { m_serialOutDevice = device; }
+void KernelLog::SetTerminalDevice(IKernelLogTerminalOutDevice* device) { m_terminalOutDevice = device; }
 
 void KernelLog::WriteChar(const char c) {
     // Write to serial out
-    if (serialOutDevice != nullptr) { serialOutDevice->PrintChar(c); }
+    if (m_serialOutDevice != nullptr) { m_serialOutDevice->PrintChar(c); }
     // Store written character to a backing store
     // TODO: Implement
     if (m_backingStore) {}
-    
+
     // Write to screen
-    if (terminalOutDevice != nullptr) { terminalOutDevice->PrintChar(c); }
+    if (m_terminalOutDevice != nullptr) { m_terminalOutDevice->PrintChar(c); }
 }
 
 void KernelLog::WriteString(const char* s) {
@@ -38,13 +39,35 @@ void KernelLog::Log(const char* category, const char* fmt, ...) {
 
 void KernelLog::LogArg(const char* category, const char* fmt, va_list arg) {
     printf("%10s | ", category);
+    
+    FormatSetLeftColumn(13);
+
     vprintf(fmt, arg);
+
+    FormatSetLeftColumn(0);
+
     WriteChar('\n');
 }
 
 void KernelLog::LogRaw(const char* fmt, ...) {
     va_list arg;
     va_start(arg, fmt);
+    
     vprintf(fmt, arg);
+    
     va_end(arg);
+}
+
+int KernelLog::FormatSetLeftColumn(int column) {
+    int old = m_fmtLeftColumn;
+    m_fmtLeftColumn = column;
+
+    if(m_terminalOutDevice != nullptr) {
+        m_terminalOutDevice->FormatSetLeftColumn(column);
+    }
+    if(m_serialOutDevice != nullptr) {
+        m_serialOutDevice->FormatSetLeftColumn(column);
+    }
+
+    return old;
 }

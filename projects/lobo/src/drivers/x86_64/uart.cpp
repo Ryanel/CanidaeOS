@@ -23,9 +23,20 @@ void UARTLoggingDevice::PrintChar(const char c) {
     outb(port, c);
 
     // Always print a carridge return on newline
-    if (c == '\n') { PrintChar('\r'); }
+    if (c == '\n') { 
+        PrintChar('\r'); 
+        for (int i = 0; i < leftColumn; i++) {
+            PrintChar(' ');
+        }
+    }
 }
 
 void UARTLoggingDevice::Clear() {
     // TODO: Implement
+}
+
+
+void UARTLoggingDevice::FormatSetLeftColumn(int column) {
+    // Does nothing
+    leftColumn = column;
 }

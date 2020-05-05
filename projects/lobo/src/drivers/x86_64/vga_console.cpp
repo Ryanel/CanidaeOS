@@ -18,7 +18,7 @@ void VGAConsoleDevice::PrintChar(const char c) {
     unsigned int offset = ((y * width) + x) * 2;
     switch (c) {
         case '\n':
-            x = 0;
+            x = leftColumn;
             y++;
             break;
 
@@ -41,7 +41,7 @@ void VGAConsoleDevice::Clear() {
 void VGAConsoleDevice::AttemptScroll() {
     if (x >= width) {
         y++;
-        x = 0;
+        x = leftColumn;
     }
 
     if (y >= height) {
@@ -65,4 +65,8 @@ void VGAConsoleDevice::AttemptScroll() {
              buffer[offsetI] = ' ';
         }
     }
+}
+
+void VGAConsoleDevice::FormatSetLeftColumn(int column) {
+    leftColumn = column;
 }

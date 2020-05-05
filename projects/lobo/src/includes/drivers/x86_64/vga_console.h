@@ -7,7 +7,7 @@ class VGAConsoleDevice : public IKernelLogTerminalOutDevice {
     void Init(int curX, int curY);
     void PrintChar(const char c);
     void Clear();
-
+    void FormatSetLeftColumn(int column);
    private:
     void AttemptScroll();
 
@@ -17,5 +17,6 @@ class VGAConsoleDevice : public IKernelLogTerminalOutDevice {
     const int height = 25;
     int x = 0;
     int y = 0;
+    int leftColumn = 0;
     unsigned char attribute = 0x0F;
 };
