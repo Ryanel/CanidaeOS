@@ -26,6 +26,7 @@ typedef struct AWDPhysmemmap {
     char     type;
     uint32_t startAddress_hi;
     uint32_t startAddress_lo;
-    uint64_t size;
+    uint32_t size_hi;
+    uint32_t size_lo;
 } awd_physmemmap_t;
 #endif

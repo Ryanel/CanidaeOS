@@ -32,8 +32,10 @@ void init_memory(awd_info_t* awd_info) {
     // Phase 1: Discovery
     physical_addr_t mem_end_address = 0;
     while ((virtual_addr_t)awd_memmap != MEM_PHYS_TO_VIRT(0)) {
-        physical_addr_t startAddress = ((uint64_t)awd_memmap->startAddress_hi << 32) | (awd_memmap->startAddress_lo);
-        physical_addr_t endAddress   = startAddress + awd_memmap->size;
+        physical_addr_t startAddress = (((uint64_t)(awd_memmap->startAddress_hi)) << 32) | awd_memmap->startAddress_lo;
+        physical_addr_t size         = ((uint64_t)(awd_memmap->size_hi) << 32) | awd_memmap->size_lo;
+        physical_addr_t endAddress   = startAddress + size;
+
         if (awd_memmap->type == AWD_MEMMAP_FREE) {
             if (mem_end_address < endAddress) { mem_end_address = endAddress; }
         }
@@ -45,11 +47,13 @@ void init_memory(awd_info_t* awd_info) {
 
     // Phase 2: Initialse the PMM
     kernelPmm.Init(mem_end_address / 0x1000);
-    
+
     awd_memmap = (awd_physmemmap_t*)(MEM_PHYS_TO_VIRT(awd_info->ptr_phys_mem_map));
     while ((virtual_addr_t)awd_memmap != MEM_PHYS_TO_VIRT(0)) {
-        physical_addr_t startAddress = ((uint64_t)awd_memmap->startAddress_hi << 32) | (awd_memmap->startAddress_lo);
-        physical_addr_t endAddress   = startAddress + awd_memmap->size;
+        physical_addr_t startAddress = (((uint64_t)(awd_memmap->startAddress_hi)) << 32) | awd_memmap->startAddress_lo;
+        physical_addr_t size         = ((uint64_t)(awd_memmap->size_hi) << 32) | awd_memmap->size_lo;
+        physical_addr_t endAddress   = startAddress + size;
+
         if (awd_memmap->type == AWD_MEMMAP_FREE) {
             for (physical_addr_t i = startAddress; i < endAddress; i += 0x1000) { kernelPmm.FreePage(i); }
         }
@@ -58,6 +62,8 @@ void init_memory(awd_info_t* awd_info) {
 
     // Forcibly mark the region below 1MB up to the kernel as used
     for (uint64_t i = 0; i < MEM_VIRT_TO_PHYS(heap_early_get_current() + 0x1000); i += 0x1000) { kernelPmm.SetPage(i); }
+
+    kernelPmm.SetFreeMemory();
 }
 
 extern "C" void kernel_entry(awd_info_t* awd_info) {
@@ -78,11 +84,11 @@ extern "C" void kernel_entry(awd_info_t* awd_info) {
     // Step 3:  Print the kernel version
     kernel_version_print();
 
-    // Step 4: Print build debug info.
-    #ifdef DEBUG
+// Step 4: Print build debug info.
+#ifdef DEBUG
     kernelLog.Log("debug", "   Kernel VM Base: 0x%016p", (uint64_t)(&KERNEL_VMB));
     kernelLog.Log("debug", "Kernel VM Address: 0x%016p", (uint64_t)(&KERNEL_VMA));
-    #endif
+#endif
 
     // Step 5: Enable Interrupts
     init_idt();
@@ -93,5 +99,5 @@ extern "C" void kernel_entry(awd_info_t* awd_info) {
     heap_init_full();                                      // Initiaalise the heap
 
     // Architecture specific setup finished, boot into kernel main...
-    kernel_main();  
+    kernel_main();
 }

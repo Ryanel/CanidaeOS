@@ -11,10 +11,11 @@ typedef struct AWDPhysmemmap {
     char     type;
     uint32_t startAddress_hi;
     uint32_t startAddress_lo;
-    uint64_t size;
+    uint32_t size_hi;
+    uint32_t size_lo;
 } awd_physmemmap_t;
 
 void              memmap_phys_add(awd_physmemmap_t* x);
-awd_physmemmap_t* memmap_phys_create(char type, uint32_t startAddress_lo, uint32_t startAddress_hi, uint64_t size);
+awd_physmemmap_t* memmap_phys_create(char type, uint32_t startAddress_lo, uint32_t startAddress_hi, uint32_t size_lo, uint32_t size_hi) ;
 awd_physmemmap_t* memmap_phys_get_root();
 #endif

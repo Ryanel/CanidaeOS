@@ -76,8 +76,10 @@ void find_memory() {
         console_print_uint64(end_addr);
         console_printchar('\n');
 
-        memmap_phys_add(memmap_phys_create(type, (uint32_t)(addr & 0xFFFFFFFF), (uint32_t)(addr & 0xFFFFFFFF00000000),
-                                           mapping->len));
+        memmap_phys_add(memmap_phys_create(type, (uint32_t)(addr & 0xFFFFFFFF), ((addr & 0xFFFFFFFF00000000) >> 32),
+                                           (mapping->len & 0xFFFFFFFF),
+                                           ((mapping->len & 0xFFFFFFFF00000000) >> 32)
+                                        ));
     }
 }
 
@@ -94,7 +96,7 @@ void awd_main(uint32_t mb_magic) {
 
     // Find the malloc region (another 2MB)
     init_malloc(0x200000, 0x400000);
-    
+
     // Map the next 2MB, for use by the kernel's initial page mapping code.
     paging_map_region(0x200000, 0x400000, 0x200000, 0x400000);
     paging_map_region(0x200000, 0x400000, (0xFFFFFFFFF8000000 + 0x200000), (0xFFFFFFFFF8000000 + 0x400000));
