@@ -15,7 +15,7 @@ void panic(const char* fmt, ...) {
 #if DEBUG
 
 void _assert(const char * expression, const char * file, const char * function, int line) {
-    KernelLog::Get().Log("assert", "\"%s\" failed in file %s on line %d in function \"%s\"", expression, file, line, function);
+    KernelLog::Get().Log("assert", "\"%s\" failed\nIn file %s, on line %d\nIn function \"%s\"", expression, file, line, function);
     panic("Assertion failed");
 }
 
