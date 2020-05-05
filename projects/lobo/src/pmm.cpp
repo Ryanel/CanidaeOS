@@ -54,7 +54,7 @@ uint64_t PMM::Allocate(uint64_t numContiguous) {
         idx++;
     }
 
-    //KernelLog::Get().Log("pmm", "Out of memory, no physical fragment of size %d", numContiguous);
+    KernelLog::Get().Log("pmm", "Out of memory, no physical fragment of size %d", numContiguous);
     panic("PMM Out of Memory");
     return 0;
 }
@@ -98,4 +98,37 @@ void PMM::DebugPrintFreePages() {
     kLog.Log("pmm", "%d/%d pages free", numFreePages, numPages);
     kLog.Log("pmm", "Used %dKB / %dKB of memory (%dMB / %dMB)", pagesUsed * 4, numPages * 4, (pagesUsed * 4) / 1024,
              (numPages * 4) / 1024);
+}
+
+void PMM::DebugPrintFreeMemory() {
+    uint64_t numFreePages = 0;
+    auto&    kLog         = KernelLog::Get();
+    for (size_t i = 0; i < numPages; i++) {
+        uint64_t address = i * 0x1000;
+        if (TestPage(address) == false) {
+            // kLog.Log("pmm","Page 0x%016p free", address);
+            numFreePages++;
+        }
+    }
+    uint64_t pagesUsed = numPages - numFreePages - m_nonMemoryBackedPages;
+    uint64_t pageLimit = m_maxFreePages;
+    kLog.Log("pmm", "%d/%d pages free", numFreePages, pageLimit);
+    kLog.Log("pmm", "Used %dKB / %dKB of memory (%dMB / %dMB)", pagesUsed * 4, pageLimit * 4, (pagesUsed * 4) / 1024,
+             (pageLimit * 4) / 1024);
+}
+
+void PMM::SetFreeMemory() {
+    uint64_t numFreePages = 0;
+    for (size_t i = 0; i < numPages; i++) {
+        uint64_t address = i * 0x1000;
+        if (TestPage(address) == false) {
+            // kLog.Log("pmm","Page 0x%016p free", address);
+            numFreePages++;
+        }
+        else {
+            m_nonMemoryBackedPages++;
+        }
+    }
+    
+    m_maxFreePages = numFreePages;
 }

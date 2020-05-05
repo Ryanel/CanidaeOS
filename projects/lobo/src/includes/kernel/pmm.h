@@ -14,6 +14,11 @@ class PMM {
     bool hasBeenInitialised = false;
     uint8_t * bitmap;
     uint64_t numPages;
+
+   public:
+    uint64_t m_maxFreePages = 0;
+    uint64_t m_nonMemoryBackedPages = 0;
+
    public:
     void Init(uint64_t numPages);
     static PMM& Get();
@@ -33,6 +38,8 @@ class PMM {
 public:
     /// Prints all pages marked as free. Very slow, only use for debugging.
     void DebugPrintFreePages();
+    void DebugPrintFreeMemory();
+    void SetFreeMemory();
 
 private:
     /// Immediately marks the bitmap as free

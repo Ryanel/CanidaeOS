@@ -128,9 +128,11 @@ void VMM::MapPages(page_table_t* p4, logical_addr_t addr, physical_addr_t p_addr
     }
 }
 
+// Attempts to map length / 0x1000 physical pages to address.
 void* VMM::Map(void* address, size_t length, int perm, int flags) {
     if (address == NULL) {
-        // Pick a spot for it.
+        uint64_t addr = PMM::Get().Allocate((length / 0x1000));
+        address = (void*)addr;
     }
     // Check to see if address is not clobbered.
     // Address is now a valid page-aligned address, and some RAM will be allocated.

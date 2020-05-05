@@ -20,12 +20,13 @@ void kernel_idle_thread() {
 void kernel_main() {
     auto& kLog      = KernelLog::Get();
     auto& kernelPmm = Kernel::PMM::Get();
+    auto& kernelVmm = Kernel::VMM::Get();
 
     kLog.Log("lobo", "Entered Kernel Main");
 
-    kernelPmm.DebugPrintFreePages();
-    
-    ASSERT(1 == 0);
+    kernelPmm.DebugPrintFreeMemory();
+
+    kernelVmm.Map((void*)0xA00000, 1, 0, 0);
 
     kernel_idle_thread();
 }
