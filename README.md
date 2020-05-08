@@ -5,7 +5,7 @@ CandidaeOS is a pure 64-bit OS.
 ## Projects
 
 * African Wild Dog (awd): A shim bootloader for x86_64, to go from a multiboot to a pure 64-bit environment.
-* Lobo: A 64-bit microkernel.
+* Lobo: A 64-bit hybrid kernel.
 
 ## Building
 

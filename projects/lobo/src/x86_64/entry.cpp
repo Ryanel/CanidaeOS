@@ -60,8 +60,9 @@ void init_memory(awd_info_t* awd_info) {
         awd_memmap = (awd_physmemmap_t*)(MEM_PHYS_TO_VIRT(awd_memmap->next));
     }
 
-    // Forcibly mark the region below 1MB up to the kernel as used
-    for (uint64_t i = 0; i < MEM_VIRT_TO_PHYS(heap_early_get_current() + 0x1000); i += 0x1000) { kernelPmm.SetPage(i); }
+    // Forcibly mark the region below 4MB as used
+    // HACK: Fix with proper memory region marking...
+    for (uint64_t i = 0; i < 0x400000; i += 0x1000) { kernelPmm.SetPage(i); }
 
     kernelPmm.SetFreeMemory();
 }
@@ -96,7 +97,6 @@ extern "C" void kernel_entry(awd_info_t* awd_info) {
     // Step 6: Initialise memory
     kernelVmm.Init(awd_info);                              // Initialise paging structures...
     init_memory((awd_info_t*)MEM_PHYS_TO_VIRT(awd_info));  // Initialise the PMM
-    heap_init_full();                                      // Initiaalise the heap
 
     // Architecture specific setup finished, boot into kernel main...
     kernel_main();

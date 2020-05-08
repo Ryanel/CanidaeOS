@@ -3,7 +3,7 @@
 #ifdef DEBUG
 
 void _assert(const char * expression, const char * file, const char * function, int line);
-#define ASSERT(cond) \
+#define assert(cond) \
                     do { \
                         if(!(cond)) { \
                             _assert(#cond, __FILE__, __FUNCTION__, __LINE__); \
@@ -12,7 +12,7 @@ void _assert(const char * expression, const char * file, const char * function, 
 
 #else 
 
-#define ASSERT(x) do { (void)sizeof(x); } while(0)  
+#define assert(x) do { (void)sizeof(x); } while(0)  
 
 #endif
 

@@ -43,9 +43,7 @@ void VMM::SetupKernelPageTable(awd_info_t* awd_info) {
     MapPages(kernelP4, 0xfffffffff8000000, MEM_VIRT_TO_PHYS(0xfffffffff8000000), 0x200000, flags);  // 0MB -> 2MB
     MapPages(kernelP4, 0xfffffffff8200000, MEM_VIRT_TO_PHYS(0xfffffffff8200000), 0x200000, flags);  // 2MB -> 4MB
 
-    physical_addr_t addressOfP4 = MEM_VIRT_TO_PHYS((physical_addr_t)kernelP4);
-
-    asm volatile("movq %0, %%cr3;" ::"r"(addressOfP4));
+    SwitchMemorySpace(kernelP4);
 
     VMM_DEBUG_LOG("Switched to Kernel Page Table 0x%016p", kernelP4);
 }
@@ -128,15 +126,33 @@ void VMM::MapPages(page_table_t* p4, logical_addr_t addr, physical_addr_t p_addr
     }
 }
 
-// Attempts to map length / 0x1000 physical pages to address.
+// Attempts to map length / 0x1000 physical pages to address in the current address space
 void* VMM::Map(void* address, size_t length, int perm, int flags) {
+    physical_addr_t pAddr = PMM::Get().Allocate((length / 0x1000));
+
     if (address == NULL) {
-        uint64_t addr = PMM::Get().Allocate((length / 0x1000));
-        address = (void*)addr;
+        // Choose an address
+        logical_addr_t address_choose_base = 0;
+        if ((flags & VMM_MAP_KERNEL) != 0) { 
+            address_choose_base = MEM_PHYS_TO_VIRT(0) + pAddr; 
+        }
+        else {
+            // Unimplemented
+            address_choose_base = 0;
+        }
+        address = (void*)(address_choose_base);  // TODO: Implement correctly
     }
     // Check to see if address is not clobbered.
     // Address is now a valid page-aligned address, and some RAM will be allocated.
-
+    MapPages(kernelP4, (logical_addr_t)address, (physical_addr_t)pAddr, length, perm);
+    SwitchMemorySpace(kernelP4);  // Flush TLB
     return address;
 }
 void* VMM::Unmap(void* address, size_t length) { return address; }
+
+void VMM::SwitchMemorySpace(page_table_t* newMemorySpace) {
+    physical_addr_t phys_addr = MEM_VIRT_TO_PHYS(newMemorySpace);
+    asm volatile("movq %0, %%cr3;" ::"r"(phys_addr));
+}
+
+void VMM::InvalidatePage(uint64_t addr) { asm volatile("invlpg (%0)" ::"r"(addr) : "memory"); }

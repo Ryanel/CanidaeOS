@@ -10,11 +10,11 @@ ASM_FLAGS := -felf64
 WARNING_FLAGS := -Wall -Wextra -Wfloat-equal -Wundef -Wcast-align -Wwrite-strings -Wlogical-op -Wredundant-decls -Wshadow -Wno-unused-parameter
 CPU_FEATURE_FLAGS := -mno-red-zone -mno-mmx -mno-sse -mno-sse2 -fno-omit-frame-pointer 
 FEATURE_FLAGS := -D DEBUG
-SHARED_FLAGS := -m64 -ffreestanding -mcmodel=kernel -O2 -g  \
+SHARED_FLAGS := -m64 -ffreestanding -mcmodel=kernel -Og -g  \
 -z max-page-size=0x1000 -Isrc/includes/ $(CPU_FEATURE_FLAGS) $(FEATURE_FLAGS) $(WARNING_FLAGS) -nostdlib
 
-C_FLAGS := $(SHARED_FLAGS) 
-CPP_FLAGS := $(SHARED_FLAGS) -fno-exceptions -fno-rtti  -Woverloaded-virtual
+C_FLAGS := $(SHARED_FLAGS)  
+CPP_FLAGS := $(SHARED_FLAGS) -fno-exceptions -fno-rtti -Woverloaded-virtual
 
 # Compilers
 ASM := nasm

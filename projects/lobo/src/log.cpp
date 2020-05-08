@@ -38,7 +38,7 @@ void KernelLog::Log(const char* category, const char* fmt, ...) {
 }
 
 void KernelLog::LogArg(const char* category, const char* fmt, va_list arg) {
-    printf("%10s | ", category);
+    printf("%8s | ", category);
     
     FormatSetLeftColumn(13);
 

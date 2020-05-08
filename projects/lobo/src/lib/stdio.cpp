@@ -99,12 +99,13 @@ void vprintf(const char* fmt, va_list arg) {
                 log.WriteChar((char)arg_int);
                 break;
 
+            case 'i': // Improper
             case 'd':
                 arg_int = va_arg(arg, int);
                 arg_str = itoa(arg_int, 10);
                 log.WriteString(arg_str);
                 break;
-
+                
             case 'x':
                 arg_int = va_arg(arg, int);
                 arg_str = itoa(arg_int, 16);
