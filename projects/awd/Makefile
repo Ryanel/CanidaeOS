@@ -16,8 +16,9 @@ ASM 	 := nasm
 CC  	 := i686-elf-gcc
 
 # Files
+AWD_OBJDIR := $(DIR_BUILD)/awd/
 AWD_SOURCES := $(shell find $(DIR_SOURCE) -name *.c -or -name *.s)
-AWD_OBJECTS := $(AWD_SOURCES:%=$(DIR_BUILD)/%.o)
+AWD_OBJECTS := $(AWD_SOURCES:%=$(AWD_OBJDIR)/%.o)
 
 # Make Rules
 all: awd
@@ -36,12 +37,12 @@ $(DIR_BUILD)/awd/awd.elf: $(AWD_OBJECTS)
 	@echo "      LNK | awd.elf" 
 	@$(CC) -T $(DIR_SOURCE)/link.ld -o $(DIR_BUILD)/awd/awd.elf $(C_FLAGS) $(LINK_FLAGS) $(AWD_OBJECTS) $(LINK_POST_FLAGS)
 
-$(DIR_BUILD)/%.s.o: %.s
+$(AWD_OBJDIR)/%.s.o: %.s
 	@mkdir -p $(dir $@)
 	@echo "      ASM | $<" 
 	@$(ASM) $(ASM_FLAGS) -o $@ $<
 
-$(DIR_BUILD)/%.c.o: %.c
+$(AWD_OBJDIR)/%.c.o: %.c
 	@mkdir -p $(dir $@)
 	@echo "        C | $<" 
 	@$(CC) $(C_FLAGS) -c $< -o $@ 

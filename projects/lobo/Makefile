@@ -22,17 +22,18 @@ CC  := x86_64-elf-gcc
 CPP := x86_64-elf-g++
 
 # Files
+LOBO_OBJDIR := $(DIR_BUILD)/lobo/
 LOBO_SOURCES := $(shell find $(DIR_SOURCE) -type f \( -iname *.cpp -or -iname *.c -or -iname *.s \) -not -iname "crt*"  )
-LOBO_OBJECTS := $(LOBO_SOURCES:%=$(DIR_BUILD)/%.o)
+LOBO_OBJECTS := $(LOBO_SOURCES:%=$(LOBO_OBJDIR)/%.o)
 CRTBEGIN_OBJ:=$(shell $(CPP) $(CPP_FLAGS) -print-file-name=crtbegin.o)
 CRTEND_OBJ:=$(shell $(CPP) $(CPP_FLAGS) -print-file-name=crtend.o)
 
 CRTI_SRC = $(DIR_SOURCE)/crt/crti.s
 CRTN_SRC = $(DIR_SOURCE)/crt/crti.s
-CRTI_OBJ=$(DIR_BUILD)/src/x86_64/crt/crti.s.o
-CRTN_OBJ=$(DIR_BUILD)/src/x86_64/crt/crtn.s.o
+CRTI_OBJ=$(LOBO_OBJDIR)/src/x86_64/crt/crti.s.o
+CRTN_OBJ=$(LOBO_OBJDIR)/src/x86_64/crt/crtn.s.o
 
-LOBO_LINK_LIST := $(CRTI_OBJ) $(CRTBEGIN_OBJ) $(LOBO_SOURCES:%=$(DIR_BUILD)/%.o) $(CRTEND_OBJ) $(CRTN_OBJ)
+LOBO_LINK_LIST := $(CRTI_OBJ) $(CRTBEGIN_OBJ) $(LOBO_OBJECTS) $(CRTEND_OBJ) $(CRTN_OBJ)
 
 # Make Rules
 all: lobo
@@ -48,17 +49,17 @@ $(DIR_BUILD)/lobo/lobo.elf: $(LOBO_LINK_LIST)
 	@echo "      LNK | lobo.elf" 
 	@$(CPP) -T $(DIR_SOURCE)/x86_64/link.ld -o $(DIR_BUILD)/lobo/lobo.elf $(CPP_FLAGS) $(LINK_FLAGS) $(LOBO_LINK_LIST) $(LINK_POST_FLAGS)
 
-$(DIR_BUILD)/%.s.o: %.s
+$(LOBO_OBJDIR)/%.s.o: %.s
 	@mkdir -p $(dir $@)
 	@echo "      ASM | $<" 
 	@$(ASM) $(ASM_FLAGS) -o $@ $<
 
-$(DIR_BUILD)/%.c.o: %.c
+$(LOBO_OBJDIR)/%.c.o: %.c
 	@mkdir -p $(dir $@)
 	@echo "        C | $<" 
 	@$(CC) $(C_FLAGS) -c $< -o $@ 
 
-$(DIR_BUILD)/%.cpp.o: %.cpp
+$(LOBO_OBJDIR)/%.cpp.o: %.cpp
 	@mkdir -p $(dir $@)
 	@echo "      CPP | $<" 
 	@$(CPP) $(CPP_FLAGS) -c $< -o $@ 
