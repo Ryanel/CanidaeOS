@@ -9,9 +9,14 @@ ASM_FLAGS := -felf64
 
 WARNING_FLAGS := -Wall -Wextra -Wfloat-equal -Wundef -Wcast-align -Wwrite-strings -Wlogical-op -Wredundant-decls -Wshadow -Wno-unused-parameter
 CPU_FEATURE_FLAGS := -mno-red-zone -mno-mmx -mno-sse -mno-sse2 -fno-omit-frame-pointer 
-FEATURE_FLAGS := -D DEBUG
-SHARED_FLAGS := -m64 -ffreestanding -mcmodel=kernel -Og -g -MMD \
+FEATURE_FLAGS := -fstack-protector -D DEBUG
+
+LIBC_FLAGS := -m64 -Og -g -ffreestanding -MMD \
 -z max-page-size=0x1000 -I$(DIR_SOURCE)/includes/ $(CPU_FEATURE_FLAGS) $(FEATURE_FLAGS) $(WARNING_FLAGS) -nostdlib
+
+LIBK_FLAGS := -m64 -ffreestanding -mcmodel=kernel -Og -g -MMD \
+-z max-page-size=0x1000 -I$(DIR_SOURCE)/includes/ $(CPU_FEATURE_FLAGS) $(FEATURE_FLAGS) $(WARNING_FLAGS) -nostdlib
+
 
 C_FLAGS := $(SHARED_FLAGS)  
 CPP_FLAGS := $(SHARED_FLAGS) -fno-exceptions -fno-rtti -Woverloaded-virtual
@@ -77,12 +82,12 @@ $(OBJDIR)/%.s.o: %.s
 $(OBJDIR)/%.c.o: %.c
 	@mkdir -p $(dir $@)
 	@echo "        C | $<" 
-	@$(CC) $(C_FLAGS) -c $< -o $@ 
+	@$(CC) $(LIBC_FLAGS) $(C_FLAGS) -c $< -o $@ 
 
 $(OBJDIR)/%.cpp.o: %.cpp
 	@mkdir -p $(dir $@)
 	@echo "      CPP | $<" 
-	@$(CPP) $(CPP_FLAGS) -c $< -o $@ 
+	@$(CPP) $(LIBC_FLAGS) $(CPP_FLAGS) -c $< -o $@ 
 
 
 $(OBJDIR)/%.s.libk.o: %.s
@@ -93,9 +98,9 @@ $(OBJDIR)/%.s.libk.o: %.s
 $(OBJDIR)/%.c.libk.o: %.c
 	@mkdir -p $(dir $@)
 	@echo "  [K]   C | $<" 
-	@$(CC) $(C_FLAGS) -D__is_libk -c $< -o $@ 
+	@$(CC) $(LIBK_FLAGS) $(C_FLAGS) -D__is_libk -c $< -o $@ 
 
 $(OBJDIR)/%.cpp.libk.o: %.cpp
 	@mkdir -p $(dir $@)
 	@echo "  [K] CPP | $<" 
-	@$(CPP) $(CPP_FLAGS) -D__is_libk  -c $< -o $@ 
+	@$(CPP) $(LIBK_FLAGS) $(CPP_FLAGS) -D__is_libk  -c $< -o $@ 

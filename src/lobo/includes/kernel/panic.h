@@ -1,3 +1,3 @@
 #pragma once
 
-void panic(const char* fmt, ...);
+extern "C" void panic(const char* fmt, ...);
