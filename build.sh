@@ -22,7 +22,7 @@ cd .. # Projects
 
 # Build ISO
 mkdir -p $DIR_BUILD/sysroot/
-cp -r data/iso/* $DIR_BUILD/sysroot/
+cp -r src/buildmedia/iso/* $DIR_BUILD/sysroot/
 
 cp $DIR_BUILD/awd/awd.elf $DIR_BUILD/sysroot/boot.elf
 cp $DIR_BUILD/lobo/lobo.elf $DIR_BUILD/sysroot/kernel.elf
