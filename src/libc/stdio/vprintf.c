@@ -1,25 +1,24 @@
-#include <stdarg.h>
+#include <stdio.h>
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
+#include <stdlib.h>
 
-#include "kernel/log.h"
+#ifdef __is_libk
 
-static void vprintf_print_padding(KernelLog& log, int length, char* arg,
-                                  bool fmt_length_zeropad) {
+extern void vprintf_print_helper(char c);
+extern void vprintf_print_helper_string(char * s);
+static void vprintf_print_padding_helper(int length, char* arg, bool fmt_length_zeropad) {
     if (length != 0) {
         int  charsToPrint = length - strlen(arg);
         char charToPrint  = ' ';
         if (fmt_length_zeropad) { charToPrint = '0'; }
-        for (; charsToPrint > 0; charsToPrint--) { log.WriteChar(charToPrint); }
+        for (; charsToPrint > 0; charsToPrint--) { vprintf_print_helper(charToPrint); }
     }
 }
 
 void vprintf(const char* fmt, va_list arg) {
-    // Cache kernel log reference...
-    KernelLog& log = KernelLog::Get();
 
     // Format variables
     const char* fmt_scan;
@@ -37,7 +36,7 @@ void vprintf(const char* fmt, va_list arg) {
     // Scan along the format string
     for (fmt_scan = fmt; *fmt_scan != '\0'; fmt_scan++) {
         if (*fmt_scan != '%') {
-            log.WriteChar(*fmt_scan);
+            vprintf_print_helper(*fmt_scan);
             continue;
         }
 
@@ -80,43 +79,43 @@ void vprintf(const char* fmt, va_list arg) {
 
         switch (fmt_specifier) {
             case '%':
-                log.WriteChar('%');
+                vprintf_print_helper('%');
                 break;
 
             case 's':
                 arg_str = va_arg(arg, char*);
                 if (fmt_left_justify) {
-                    log.WriteString(arg_str);
-                    vprintf_print_padding(log, fmt_length, arg_str, false);
+                    vprintf_print_helper_string(arg_str);
+                    vprintf_print_padding_helper(fmt_length, arg_str, false);
                 } else {
-                    vprintf_print_padding(log, fmt_length, arg_str, false);
-                    log.WriteString(arg_str);
+                    vprintf_print_padding_helper(fmt_length, arg_str, false);
+                    vprintf_print_helper_string(arg_str);
                 }
                 break;
 
             case 'c':
                 arg_int = va_arg(arg, int);
-                log.WriteChar((char)arg_int);
+                vprintf_print_helper((char)arg_int);
                 break;
 
             case 'i': // Improper
             case 'd':
                 arg_int = va_arg(arg, int);
                 arg_str = itoa(arg_int, 10);
-                log.WriteString(arg_str);
+                vprintf_print_helper_string(arg_str);
                 break;
                 
             case 'x':
                 arg_int = va_arg(arg, int);
                 arg_str = itoa(arg_int, 16);
                 if (fmt_left_justify) {
-                    log.WriteString(arg_str);
-                    vprintf_print_padding(log, fmt_length, arg_str,
+                    vprintf_print_helper_string(arg_str);
+                    vprintf_print_padding_helper(fmt_length, arg_str,
                                           fmt_length_zeropad);
                 } else {
-                    vprintf_print_padding(log, fmt_length, arg_str,
+                    vprintf_print_padding_helper(fmt_length, arg_str,
                                           fmt_length_zeropad);
-                    log.WriteString(arg_str);
+                    vprintf_print_helper_string(arg_str);
                 }
 
                 break;
@@ -125,26 +124,27 @@ void vprintf(const char* fmt, va_list arg) {
                 arg_int64 = va_arg(arg, uint64_t);
                 arg_str   = itoa(arg_int64, 16);
                 if (fmt_left_justify) {
-                    log.WriteString(arg_str);
-                    vprintf_print_padding(log, fmt_length, arg_str,
+                    vprintf_print_helper_string(arg_str);
+                    vprintf_print_padding_helper(fmt_length, arg_str,
                                           fmt_length_zeropad);
                 } else {
-                    vprintf_print_padding(log, fmt_length, arg_str,
+                    vprintf_print_padding_helper(fmt_length, arg_str,
                                           fmt_length_zeropad);
-                    log.WriteString(arg_str);
+                    vprintf_print_helper_string(arg_str);
                 }
                 break;
 
             default:
-                log.WriteChar(*fmt_scan);
+                vprintf_print_helper(*fmt_scan);
                 break;
         }
     }
 }
 
-void printf(const char* fmt, ...) {
-    va_list arg;
-    va_start(arg, fmt);
-    vprintf(fmt, arg);
-    va_end(arg);
+#else
+
+void vprintf(const char* fmt, va_list arg) {
+
 }
+
+#endif

@@ -1,6 +1,7 @@
 # Executables
 *.elf
 a.out
+*.a
 
 # Build directory
 build/
