@@ -6,6 +6,7 @@
 #define AWD_MEMMAP_FREE 0
 #define AWD_MEMMAP_USED 1
 
+/// AWD Memory Map
 typedef struct AWDPhysmemmap {
     uint32_t next;
     char     type;

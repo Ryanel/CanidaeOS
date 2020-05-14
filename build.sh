@@ -10,7 +10,7 @@ DIR_BUILD=$(readlink -f $DIR_BUILD)
 mkdir -p $DIR_BUILD
 
 # Start compiling projects
-cd projects
+cd src
 
 echo "----------+- Compiling AWD ------------------------"
 cd awd; DIR_BUILD=$DIR_BUILD make awd $MAKE_OPTS; cd ..

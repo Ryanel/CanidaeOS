@@ -1,6 +1,6 @@
 # Directories
 DIR_BUILD ?= ../../build/
-DIR_SOURCE := src
+DIR_SOURCE := .
 
 # Flags
 LINK_FLAGS := 
@@ -10,8 +10,8 @@ ASM_FLAGS := -felf64
 WARNING_FLAGS := -Wall -Wextra -Wfloat-equal -Wundef -Wcast-align -Wwrite-strings -Wlogical-op -Wredundant-decls -Wshadow -Wno-unused-parameter
 CPU_FEATURE_FLAGS := -mno-red-zone -mno-mmx -mno-sse -mno-sse2 -fno-omit-frame-pointer 
 FEATURE_FLAGS := -D DEBUG
-SHARED_FLAGS := -m64 -ffreestanding -mcmodel=kernel -Og -g  \
--z max-page-size=0x1000 -Isrc/includes/ $(CPU_FEATURE_FLAGS) $(FEATURE_FLAGS) $(WARNING_FLAGS) -nostdlib
+SHARED_FLAGS := -m64 -ffreestanding -mcmodel=kernel -Og -g -MMD \
+-z max-page-size=0x1000 -I$(DIR_SOURCE)/includes/ $(CPU_FEATURE_FLAGS) $(FEATURE_FLAGS) $(WARNING_FLAGS) -nostdlib
 
 C_FLAGS := $(SHARED_FLAGS)  
 CPP_FLAGS := $(SHARED_FLAGS) -fno-exceptions -fno-rtti -Woverloaded-virtual
@@ -22,18 +22,22 @@ CC  := x86_64-elf-gcc
 CPP := x86_64-elf-g++
 
 # Files
-LOBO_OBJDIR := $(DIR_BUILD)/lobo/
-LOBO_SOURCES := $(shell find $(DIR_SOURCE) -type f \( -iname *.cpp -or -iname *.c -or -iname *.s \) -not -iname "crt*"  )
+LOBO_OBJDIR := $(DIR_BUILD)/lobo
+LOBO_SOURCES := $(shell find $(DIR_SOURCE) -type f \( -iname '*.cpp' -or -iname '*.c' -or -iname '*.s' \) -not -iname "crt*"  )
 LOBO_OBJECTS := $(LOBO_SOURCES:%=$(LOBO_OBJDIR)/%.o)
 CRTBEGIN_OBJ:=$(shell $(CPP) $(CPP_FLAGS) -print-file-name=crtbegin.o)
 CRTEND_OBJ:=$(shell $(CPP) $(CPP_FLAGS) -print-file-name=crtend.o)
 
 CRTI_SRC = $(DIR_SOURCE)/crt/crti.s
 CRTN_SRC = $(DIR_SOURCE)/crt/crti.s
-CRTI_OBJ=$(LOBO_OBJDIR)/src/x86_64/crt/crti.s.o
-CRTN_OBJ=$(LOBO_OBJDIR)/src/x86_64/crt/crtn.s.o
+CRTI_OBJ=$(LOBO_OBJDIR)/x86_64/crti.s.o
+CRTN_OBJ=$(LOBO_OBJDIR)/x86_64/crtn.s.o
+
+OBJ_DEPEND = $(LOBO_OBJECTS:%.o=%.d)
 
 LOBO_LINK_LIST := $(CRTI_OBJ) $(CRTBEGIN_OBJ) $(LOBO_OBJECTS) $(CRTEND_OBJ) $(CRTN_OBJ)
+
+-include $(OBJ_DEPEND)
 
 # Make Rules
 all: lobo

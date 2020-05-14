@@ -19,6 +19,9 @@
 #define USE_CASE4
 #define USE_CASE5
 
+#undef DEBUG
+#undef INFO
+
 /** This macro will conveniently align our pointer upwards */
 #define ALIGN(ptr)                                                          \
     if (ALIGNMENT > 1) {                                                    \
