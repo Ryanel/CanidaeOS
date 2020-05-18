@@ -25,7 +25,7 @@ VGAConsoleDevice  boot_vga_console_device;
 
 void init_memory(awd_info_t* awd_info) {
     auto& kernelLog = KernelLog::Get();
-    auto& kernelPmm = PMM::Get();
+    auto& kernelPmm = pmm::get();
 
     awd_physmemmap_t* awd_memmap = (awd_physmemmap_t*)(MEM_PHYS_TO_VIRT(awd_info->ptr_phys_mem_map));
 
@@ -46,7 +46,7 @@ void init_memory(awd_info_t* awd_info) {
     kernelLog.Log("mem", "Bitmap fits in %p bytes", mem_end_address / 0x1000 / 8);
 
     // Phase 2: Initialse the PMM
-    kernelPmm.Init(mem_end_address / 0x1000);
+    kernelPmm.init(mem_end_address / 0x1000);
 
     awd_memmap = (awd_physmemmap_t*)(MEM_PHYS_TO_VIRT(awd_info->ptr_phys_mem_map));
     while ((virtual_addr_t)awd_memmap != MEM_PHYS_TO_VIRT(0)) {
@@ -55,16 +55,16 @@ void init_memory(awd_info_t* awd_info) {
         physical_addr_t endAddress   = startAddress + size;
 
         if (awd_memmap->type == AWD_MEMMAP_FREE) {
-            for (physical_addr_t i = startAddress; i < endAddress; i += 0x1000) { kernelPmm.FreePage(i); }
+            for (physical_addr_t i = startAddress; i < endAddress; i += 0x1000) { kernelPmm.free(i); }
         }
         awd_memmap = (awd_physmemmap_t*)(MEM_PHYS_TO_VIRT(awd_memmap->next));
     }
 
     // Forcibly mark the region below 4MB as used
     // HACK: Fix with proper memory region marking...
-    for (uint64_t i = 0; i < 0x400000; i += 0x1000) { kernelPmm.SetPage(i); }
+    for (uint64_t i = 0; i < 0x400000; i += 0x1000) { kernelPmm.set(i); }
 
-    kernelPmm.SetFreeMemory();
+    kernelPmm.set_free_memory();
 }
 
 extern "C" void kernel_early(awd_info_t* awd_info) {

@@ -63,7 +63,7 @@ extern "C" void fault_handler(struct InterruptContext* r) {
             log.Log("fault", "Faulting address: 0x%016p\n", faultingAddress);
         }
 
-        Kernel::CPU::HaltCPU();
+        kernel::cpu::HaltCPU();
     }
 }
 

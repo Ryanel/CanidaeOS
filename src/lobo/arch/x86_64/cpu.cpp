@@ -1,12 +1,12 @@
 #include "kernel/cpu.h"
 
-void Kernel::CPU::IdleLoop() {
+void kernel::cpu::IdleLoop() {
     while(true) {
         asm("hlt");
     }
 }
 
-void Kernel::CPU::HaltCPU() {
+void kernel::cpu::HaltCPU() {
     asm("cli");
     asm("hlt");
 }

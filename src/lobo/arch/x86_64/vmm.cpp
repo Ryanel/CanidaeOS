@@ -124,7 +124,7 @@ void vmm::map_pages(page_table_t* p4, logical_addr_t addr, physical_addr_t p_add
 
 // Attempts to map length / 0x1000 physical pages to address in the current address space
 void* vmm::map(void* address, size_t length, int perm, int flags) {
-    physical_addr_t pAddr = PMM::Get().Allocate((length / 0x1000));
+    physical_addr_t pAddr = pmm::get().allocate((length / 0x1000));
 
     if (address == NULL) {
         // Choose an address

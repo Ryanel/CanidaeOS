@@ -9,7 +9,7 @@ extern "C" void panic(const char* fmt, ...) {
     KernelLog::Get().Log("panic", fmt, arg);
     va_end(arg);
     
-    Kernel::CPU::HaltCPU();
+    kernel::cpu::HaltCPU();
 }
 
 #if DEBUG

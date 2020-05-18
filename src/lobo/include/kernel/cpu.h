@@ -1,6 +1,6 @@
 #pragma once
-namespace Kernel {
-namespace CPU {
+namespace kernel {
+namespace cpu {
 
 /// Put the CPU into an idle loop
 void IdleLoop();
