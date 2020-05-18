@@ -3,8 +3,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
-namespace Kernel {
-namespace Scheduling {
+namespace kernel {
+namespace scheduling {
 
 /// Flags
 constexpr int TCB_FLAG_DEAD = 0x01; // Is the thread dead?

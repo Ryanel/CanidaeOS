@@ -5,7 +5,7 @@
 #include <stdint.h>
 
 namespace common {
-/// A class that allows bit-access to a pointer
+/// A class that allows bit-access to a pointer.
 class bitset {
    public:
     /// Construct a null bitset.
@@ -14,7 +14,7 @@ class bitset {
     bitset(uint8_t* ptr, size_t length) : m_ptr(ptr), m_length(length) {}
 
     /// Test if bit is set
-    bool test(size_t bit) {
+    bool test(size_t bit) const {
         assert(bit < m_length);
         return m_ptr[bit / 8] & (1 << bit % 8);
     }
@@ -33,6 +33,8 @@ class bitset {
         assert(bit < m_length);
         test(bit) ? clear(bit) : set(bit);
     }
+    /// Get a reference to the pointer
+    uint8_t* ptr() const {return m_ptr;}
 
    private:
     uint8_t* m_ptr    = nullptr;

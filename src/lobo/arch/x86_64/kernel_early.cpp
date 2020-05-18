@@ -15,7 +15,7 @@
 #include "kernel/arch/x86_64/drivers/uart.h"
 #include "kernel/arch/x86_64/drivers/vga_console.h"
 
-using namespace Kernel;
+using namespace kernel;
 
 void kernel_main();
 void kernel_version_print();
@@ -25,7 +25,7 @@ VGAConsoleDevice  boot_vga_console_device;
 
 void init_memory(awd_info_t* awd_info) {
     auto& kernelLog = KernelLog::Get();
-    auto& kernelPmm = Kernel::PMM::Get();
+    auto& kernelPmm = PMM::Get();
 
     awd_physmemmap_t* awd_memmap = (awd_physmemmap_t*)(MEM_PHYS_TO_VIRT(awd_info->ptr_phys_mem_map));
 
@@ -69,7 +69,7 @@ void init_memory(awd_info_t* awd_info) {
 
 extern "C" void kernel_early(awd_info_t* awd_info) {
     auto& kernelLog = KernelLog::Get();
-    auto& kernelVmm = Kernel::VMM::Get();
+    auto& kernelVmm = vmm::get();
 
     // Architecture specific setup
 
@@ -95,7 +95,7 @@ extern "C" void kernel_early(awd_info_t* awd_info) {
     init_idt();
 
     // Step 6: Initialise memory
-    kernelVmm.Init(awd_info);                              // Initialise paging structures...
+    kernelVmm.init(awd_info);                              // Initialise paging structures...
     init_memory((awd_info_t*)MEM_PHYS_TO_VIRT(awd_info));  // Initialise the PMM
 
     // Architecture specific setup finished, boot into kernel main...

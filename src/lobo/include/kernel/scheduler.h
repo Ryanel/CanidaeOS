@@ -2,8 +2,8 @@
 
 #include "kernel/task.h"
 
-namespace Kernel {
-namespace Scheduling {
+namespace kernel {
+namespace scheduling {
 
 class Scheduler {
    public:

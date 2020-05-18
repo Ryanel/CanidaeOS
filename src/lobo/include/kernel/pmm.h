@@ -1,23 +1,27 @@
 #pragma once
+#include <common/bitset.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <common/bitset.h>
 
 #define PMM_NUM_BITMAPS 4
 
-namespace Kernel {
+namespace kernel {
 
 /// The Physical Memory Manager.
 /// Manages the physical address space of the computer
 class PMM {
    private:
-    bool           hasBeenInitialised = false;
-    uint8_t*       bitmap_ptr;
+    /// Has the PMM been initialised?
+    bool hasBeenInitialised = false;
+    /// The backing bitmap.
     common::bitset bitmap;
+    /// How many pages there are
     uint64_t       numPages;
 
    public:
-    uint64_t m_maxFreePages         = 0;
+    /// Maximum number of free pages
+    uint64_t m_maxFreePages = 0;
+    /// How many pages are considered mapped, but not to usable memory.
     uint64_t m_nonMemoryBackedPages = 0;
 
    public:

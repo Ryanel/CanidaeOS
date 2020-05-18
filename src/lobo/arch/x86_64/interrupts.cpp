@@ -82,7 +82,7 @@ extern "C" void interrupt_handler(struct InterruptContext* r) {
         outb(0x20, 0x20);
 
         asm("sti");  // Enable interrupts again, so we can recieve an interrupt
-        Kernel::Scheduling::Scheduler::Get().Schedule();
+        kernel::scheduling::Scheduler::Get().Schedule();
     }
 
     // End of Interrupt to PIC (and slave)

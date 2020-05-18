@@ -36,7 +36,7 @@ extern "C" int liballoc_unlock() {
  * \return A pointer to the allocated memory.
  */
 extern "C" void* liballoc_alloc(size_t n) {
-    return Kernel::VMM::Get().Map(nullptr, n*0x1000, VMM_PAGE_PRESENT | VMM_PAGE_WRITE, VMM_MAP_KERNEL);
+    return kernel::vmm::get().map(nullptr, n*0x1000, VMM_PAGE_PRESENT | VMM_PAGE_WRITE, VMM_MAP_KERNEL);
 }
 
 /** This frees previously allocated memory. The void* parameter passed
@@ -48,6 +48,6 @@ extern "C" void* liballoc_alloc(size_t n) {
  * \return 0 if the memory was successfully freed.
  */
 extern "C" int liballoc_free(void* addr,size_t n) {
-    Kernel::VMM::Get().Unmap(addr, n * 0x1000);
+    kernel::vmm::get().unmap(addr, n * 0x1000);
     return 0;
 }

@@ -7,7 +7,7 @@
 #include "kernel/panic.h"
 #include "kernel/pmm.h"
 
-using namespace Kernel;
+using namespace kernel;
 
 static PMM kernel_pmm;
 
@@ -17,7 +17,6 @@ void PMM::Init(uint64_t num) {
     if (hasBeenInitialised) { return; }
     this->numPages = num;
     bitmap = common::bitset((uint8_t*)kmalloc((this->numPages / 8) + 1), this->numPages);
-
     hasBeenInitialised = true;
 
     for (size_t i = 0; i < this->numPages; i++) { SetPage(i * 0x1000); }
