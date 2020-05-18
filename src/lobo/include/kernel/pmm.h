@@ -1,17 +1,14 @@
 #pragma once
 #include <stddef.h>
 #include <stdint.h>
-
 #include <common/bitset.h>
-
-/// Physical Memory Manager
-/// Manages the physical address space of the computer
 
 #define PMM_NUM_BITMAPS 4
 
 namespace Kernel {
 
-/// The Physical Memory Manager
+/// The Physical Memory Manager.
+/// Manages the physical address space of the computer
 class PMM {
    private:
     bool           hasBeenInitialised = false;
@@ -42,13 +39,17 @@ class PMM {
    public:
     /// Prints all pages marked as free. Very slow, only use for debugging.
     void DebugPrintFreePages();
+    /// Prints how much memory is free
     void DebugPrintFreeMemory();
+    /// Sets the current number of allocated pages as the 0 point for free memory.
     void SetFreeMemory();
 
    private:
-    /// Immediately marks the bitmap as free
+    /// Sets physAddress to free in bitmap
     void BitmapFreePage(uint64_t physAddress);
+    /// Sets physAddress to used in bitmap
     void BitmapSetPage(uint64_t physAddress);
+    /// Checks if physAddress is used
     bool BitmapTestPage(uint64_t physAddress);
 };
 
