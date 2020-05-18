@@ -16,11 +16,11 @@ PMM& PMM::Get() { return kernel_pmm; }
 void PMM::Init(uint64_t num) {
     if (hasBeenInitialised) { return; }
     this->numPages = num;
-
-    bitmap = (uint8_t*)kmalloc((num / 8) + 1);
+    bitmap = common::bitset((uint8_t*)kmalloc((this->numPages / 8) + 1), this->numPages);
 
     hasBeenInitialised = true;
-    for (size_t i = 0; i < numPages; i++) { SetPage(i * 0x1000); }
+
+    for (size_t i = 0; i < this->numPages; i++) { SetPage(i * 0x1000); }
 }
 
 uint64_t PMM::Allocate(uint64_t numContiguous) {
@@ -66,21 +66,15 @@ void PMM::FreePage(uint64_t physAddress) { BitmapFreePage(physAddress); }
 bool PMM::TestPage(uint64_t physAddress) { return BitmapTestPage(physAddress); }
 
 void PMM::BitmapSetPage(uint64_t physAddress) {
-    uint64_t pageNumber = physAddress / 0x1000;
-    uint64_t bitNumber  = pageNumber % 8;
-    bitmap[pageNumber / 8] |= (1 << (bitNumber));
+    bitmap.set(physAddress / 0x1000);
 }
 
 void PMM::BitmapFreePage(uint64_t physAddress) {
-    uint64_t pageNumber = physAddress / 0x1000;
-    uint64_t bitNumber  = pageNumber % 8;
-    bitmap[pageNumber / 8] &= ~(1 << (bitNumber));
+    bitmap.clear(physAddress / 0x1000);
 }
 
 bool PMM::BitmapTestPage(uint64_t physAddress) {
-    uint64_t pageNumber = physAddress / 0x1000;
-    uint64_t bitNumber  = pageNumber % 8;
-    return bitmap[pageNumber / 8] & (1 << bitNumber);
+    return bitmap.test(physAddress / 0x1000);
 }
 
 void PMM::DebugPrintFreePages() {

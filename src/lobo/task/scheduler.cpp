@@ -7,7 +7,7 @@
 #include <kernel/task.h>
 #include <kernel/vmm.h>
 
-using namespace Kernel;
+using namespace Kernel::Scheduling;
 
 extern "C" void switch_thread(ThreadControlBlock* newThread, ThreadControlBlock* oldThread);
 

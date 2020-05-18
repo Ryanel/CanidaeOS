@@ -3,13 +3,20 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#define TASK_FLAG_DEAD 0x01
+namespace Kernel {
+namespace Scheduling {
+
+/// Flags
+constexpr int TCB_FLAG_DEAD = 0x01; // Is the thread dead?
 
 class ThreadControlBlock {
    public:
-    uint64_t    stack_top;         // The Virtual Address of the Stack 
-    uint64_t    vas;               // Virtual address space, page table.
-    uint64_t    flags;             // Flags
-    const char* taskName;
+    uint64_t            stack_top;  // The Virtual Address of the Stack
+    uint64_t            vas;        // Virtual address space, page table.
+    uint64_t            flags;      // Flags
+    const char*         taskName;
     ThreadControlBlock* next;
 };
+
+};  // namespace Scheduling
+}  // namespace Kernel

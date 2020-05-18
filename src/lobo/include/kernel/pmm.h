@@ -2,6 +2,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include <common/bitset.h>
+
 /// Physical Memory Manager
 /// Manages the physical address space of the computer
 
@@ -11,16 +13,18 @@ namespace Kernel {
 
 /// The Physical Memory Manager
 class PMM {
-    bool hasBeenInitialised = false;
-    uint8_t * bitmap;
-    uint64_t numPages;
+   private:
+    bool           hasBeenInitialised = false;
+    uint8_t*       bitmap_ptr;
+    common::bitset bitmap;
+    uint64_t       numPages;
 
    public:
-    uint64_t m_maxFreePages = 0;
+    uint64_t m_maxFreePages         = 0;
     uint64_t m_nonMemoryBackedPages = 0;
 
    public:
-    void Init(uint64_t numPages);
+    void        Init(uint64_t numPages);
     static PMM& Get();
 
    public:
@@ -35,17 +39,17 @@ class PMM {
     /// Tests to see if a page is used in Physical Memory
     bool TestPage(uint64_t physAddress);
 
-public:
+   public:
     /// Prints all pages marked as free. Very slow, only use for debugging.
     void DebugPrintFreePages();
     void DebugPrintFreeMemory();
     void SetFreeMemory();
 
-private:
+   private:
     /// Immediately marks the bitmap as free
     void BitmapFreePage(uint64_t physAddress);
     void BitmapSetPage(uint64_t physAddress);
     bool BitmapTestPage(uint64_t physAddress);
 };
 
-};
+};  // namespace Kernel
