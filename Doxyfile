@@ -6,7 +6,7 @@
 DOXYFILE_ENCODING      = UTF-8
 PROJECT_NAME           = "The Lobo Kernel"
 PROJECT_NUMBER         =
-PROJECT_BRIEF          = A 64-bit hybrid kernel
+PROJECT_BRIEF          = "A 64-bit hybrid kernel"
 PROJECT_LOGO           =
 OUTPUT_DIRECTORY       = ./build/docs/lobo/
 CREATE_SUBDIRS         = NO
