@@ -1,7 +1,7 @@
 #pragma once
 #include <stdint.h>
 // Include kernel configuration
-#include <kconfig.h>
+#include <kernel/kconfig.h>
 
 // Linker symbols, take the address of them.
 extern "C" uint64_t KERNEL_VMB;

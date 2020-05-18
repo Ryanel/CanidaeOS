@@ -1,10 +1,11 @@
-#include "x86_64/interrupts.h"
+#include <kernel/arch/x86_64/interrupt_methods.h>
+#include <kernel/arch/x86_64/interrupts.h>
+#include <kernel/arch/x86_64/ports.h>
+#include <kernel/cpu.h>
+#include <kernel/log.h>
+#include <kernel/scheduler.h>
 #include <string.h>
-#include "kernel/log.h"
-#include "kernel/cpu.h"
-#include "x86_64/interrupt_methods.h"
-#include "x86_64/ports.h"
-#include "kernel/scheduler.h"
+
 idt_table_entry_t table_idt[256] __attribute__((aligned(0x1000)));
 idt_table_ptr_t   table_idt_ptr;
 
@@ -45,8 +46,9 @@ extern "C" void fault_handler(struct InterruptContext* r) {
     // KernelLog::Get().Log("int", "Caught an interrupt! %d, error %p", r->int_no, r->err_code);
 
     if (r->int_no < 32) {
-        log.LogRaw("%35sException\n","");
-        log.Log("fault", "%s (int %d), Error Code: 0x%08x", exception_strings[r->int_no], r->int_no, (uint32_t)r->err_code);
+        log.LogRaw("%35sException\n", "");
+        log.Log("fault", "%s (int %d), Error Code: 0x%08x", exception_strings[r->int_no], r->int_no,
+                (uint32_t)r->err_code);
         log.Log("fault", "RBP:0x%016p RSP:0x%016p RIP:0x%016p", r->rbp, r->userrsp, r->rip);
         log.Log("fault", "RAX:0x%016p RBX:0x%016p RCX:0x%016p", r->rax, r->rbx, r->rcx);
         log.Log("fault", "RDX:0x%016p RDI:0x%016p RSI:0x%016p", r->rdx, r->rdi, r->rsi);
@@ -54,40 +56,37 @@ extern "C" void fault_handler(struct InterruptContext* r) {
         log.Log("fault", "R11:0x%016p R12:0x%016p R13:0x%016p", r->r11, r->r12, r->r13);
         log.Log("fault", "R14:0x%016p R15:0x%016p", r->r14, r->r15);
 
-        if(r->int_no == 14) {
+        if (r->int_no == 14) {
             // Page fault
             uint64_t faultingAddress;
-            asm volatile("mov %%cr2, %0" : "=r" (faultingAddress));
+            asm volatile("mov %%cr2, %0" : "=r"(faultingAddress));
             log.Log("fault", "Faulting address: 0x%016p\n", faultingAddress);
         }
 
         Kernel::CPU::HaltCPU();
     }
-
-    
 }
 
 extern "C" void interrupt_handler(struct InterruptContext* r) {
-    auto& log = KernelLog::Get();
-    bool eoi_sent_early = false;
+    auto& log            = KernelLog::Get();
+    bool  eoi_sent_early = false;
 
     // Print out any IRQ that's not IRQ 0
-    if(r->int_no != 32) { 
+    if (r->int_no != 32) {
         log.Log("int", "Recieved IRQ %d, handled.", (r->int_no - 32));
-    }
-    else {
+    } else {
         // Timer interrupt
         eoi_sent_early = true;
-        
+
         if (r->int_no >= 40) { outb(0xA0, 0x20); }
         outb(0x20, 0x20);
 
-        asm("sti"); // Enable interrupts again, so we can recieve an interrupt
+        asm("sti");  // Enable interrupts again, so we can recieve an interrupt
         Kernel::Scheduler::Get().Schedule();
     }
 
     // End of Interrupt to PIC (and slave)
-    if(!eoi_sent_early) {
+    if (!eoi_sent_early) {
         if (r->int_no >= 40) { outb(0xA0, 0x20); }
         outb(0x20, 0x20);
     }
@@ -102,8 +101,8 @@ idt_table_entry_t idt_populate_entry(uint64_t entry, uint16_t cs_selector, uint8
     idt_entry.cs_selector = cs_selector;
     idt_entry.attributes  = attributes;
     // Already memset to zero
-    //idt_entry.zero_2 = 0; 
-    //idt_entry.ist    = 0;
+    // idt_entry.zero_2 = 0;
+    // idt_entry.ist    = 0;
     return idt_entry;
 }
 
@@ -183,6 +182,6 @@ void init_idt() {
     interrupt_set_idt((uint64_t)(&table_idt_ptr));
 
     kernelLog.Log("int", "Interrupts enabled");
-    
-    asm("sti"); // Start interrupts
+
+    asm("sti");  // Start interrupts
 }

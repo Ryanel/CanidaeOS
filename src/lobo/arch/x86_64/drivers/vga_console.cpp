@@ -1,9 +1,9 @@
-#include "drivers/x86_64/vga_console.h"
+#include "kernel/arch/x86_64/drivers/vga_console.h"
 
 #include <stddef.h>
 #include <stdint.h>
 
-#include "x86_64/ports.h"
+#include "kernel/arch/x86_64/ports.h"
 #include "kernel/kernel.h"
 
 

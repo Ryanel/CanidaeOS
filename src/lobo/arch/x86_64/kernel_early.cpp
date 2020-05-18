@@ -10,10 +10,10 @@
 #include "kernel/pmm.h"
 #include "kernel/vmm.h"
 
-#include "x86_64/interrupts.h"
+#include "kernel/arch/x86_64/interrupts.h"
 
-#include "drivers/x86_64/uart.h"
-#include "drivers/x86_64/vga_console.h"
+#include "kernel/arch/x86_64/drivers/uart.h"
+#include "kernel/arch/x86_64/drivers/vga_console.h"
 
 using namespace Kernel;
 
@@ -67,7 +67,7 @@ void init_memory(awd_info_t* awd_info) {
     kernelPmm.SetFreeMemory();
 }
 
-extern "C" void kernel_entry(awd_info_t* awd_info) {
+extern "C" void kernel_early(awd_info_t* awd_info) {
     auto& kernelLog = KernelLog::Get();
     auto& kernelVmm = Kernel::VMM::Get();
 

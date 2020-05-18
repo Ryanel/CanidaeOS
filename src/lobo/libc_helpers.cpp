@@ -16,12 +16,19 @@ extern "C" void vprintf_print_padding_helper(int length, char* arg, bool fmt_len
     }
 }
 
+/// C wrapper to print a char to the kernel log from vprintf
 extern "C" void vprintf_print_helper(char c) {
     auto& log = KernelLog::Get();
     log.WriteChar(c);
 }
 
+/// C wrapper to print a string to the kernel log from vprintf
 extern "C" void vprintf_print_helper_string(char * s) {
     auto& log = KernelLog::Get();
     log.WriteString(s);
+}
+
+/// For pure virtual functions
+extern "C" void __cxa_pure_virtual()
+{
 }

@@ -12,11 +12,11 @@ CPU_FEATURE_FLAGS := -mno-red-zone -mno-mmx -mno-sse -mno-sse2 -fno-omit-frame-p
 
 FEATURE_FLAGS := -fstack-protector -D __is_kernel -D DEBUG
 SHARED_FLAGS := -m64 -ffreestanding -mcmodel=kernel -Og -g -MMD -z max-page-size=0x1000 \
- --sysroot=$(DIR_SYSROOT) -I$(DIR_SYSROOT)/usr/include/ -I$(DIR_SOURCE)/includes/ \
+ --sysroot=$(DIR_SYSROOT) -I$(DIR_SYSROOT)/usr/include/ -I$(DIR_SOURCE)/include/ \
  $(CPU_FEATURE_FLAGS) $(FEATURE_FLAGS) $(WARNING_FLAGS) -nostdlib
 
 C_FLAGS := $(SHARED_FLAGS)  
-CPP_FLAGS := $(SHARED_FLAGS) -fno-exceptions -fno-rtti -Woverloaded-virtual
+CPP_FLAGS := $(SHARED_FLAGS) -std=c++17 -fno-exceptions -fno-rtti -Woverloaded-virtual
 
 # Compilers
 ASM := nasm
@@ -32,8 +32,8 @@ CRTEND_OBJ:=$(shell $(CPP) $(CPP_FLAGS) -print-file-name=crtend.o)
 
 CRTI_SRC = $(DIR_SOURCE)/crt/crti.s
 CRTN_SRC = $(DIR_SOURCE)/crt/crti.s
-CRTI_OBJ=$(LOBO_OBJDIR)/x86_64/crti.s.o
-CRTN_OBJ=$(LOBO_OBJDIR)/x86_64/crtn.s.o
+CRTI_OBJ=$(LOBO_OBJDIR)/arch/x86_64/crti.s.o
+CRTN_OBJ=$(LOBO_OBJDIR)/arch/x86_64/crtn.s.o
 
 OBJ_DEPEND = $(LOBO_OBJECTS:%.o=%.d)
 
@@ -53,7 +53,7 @@ clean:
 $(DIR_BUILD)/lobo/lobo.elf: $(LOBO_LINK_LIST)
 	@mkdir -p $(dir $@)
 	@echo "      LNK | lobo.elf" 
-	@$(CPP) -T $(DIR_SOURCE)/x86_64/link.ld -o $(DIR_BUILD)/lobo/lobo.elf $(CPP_FLAGS) $(LINK_FLAGS) $(LOBO_LINK_LIST) $(LINK_POST_FLAGS)
+	@$(CPP) -T $(DIR_SOURCE)/arch/x86_64/link.ld -o $(DIR_BUILD)/lobo/lobo.elf $(CPP_FLAGS) $(LINK_FLAGS) $(LOBO_LINK_LIST) $(LINK_POST_FLAGS)
 
 $(LOBO_OBJDIR)/%.s.o: %.s
 	@mkdir -p $(dir $@)

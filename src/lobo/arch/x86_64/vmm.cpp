@@ -86,42 +86,38 @@ page_entry_t* VMM::FindEntry(page_table_t* p4, logical_addr_t addr, bool create)
 
 virtual_addr_t VMM::GrabTable(page_table_t* pt, uintptr_t index, bool create) {
     page_table_t* table = nullptr;
-    if (pt->entries[index] == 0) {  // Does not exist, create it
-        if (!create) return 0;
-
-        table = (page_table_t*)kmalloc_aligned(PAGE_SIZE, 0x1000);
+    // Does the table exist?
+    if (pt->entries[index] == 0) {                                  // No, it does not exist.
+        if (!create) return 0;                                      // Create it?
+        table = (page_table_t*)kmalloc_aligned(PAGE_SIZE, 0x1000);  // Create it.
         memset(table, 0, PAGE_SIZE);
-
+        // Write to existing page table.
         physical_addr_t table_phys = MEM_VIRT_TO_PHYS((uint64_t)table);
-
-        pt->entries[index] = VMM_PAGE_CREATE_ENTRY(table_phys, (VMM_PAGE_PRESENT | VMM_PAGE_WRITE));
-    } else {
+        pt->entries[index]         = VMM_PAGE_CREATE_ENTRY(table_phys, (VMM_PAGE_PRESENT | VMM_PAGE_WRITE));
+    } else {  // Yes, it exists.
         table = (page_table_t*)MEM_PHYS_TO_VIRT(VMM_PAGE_ENTRY_ADDR(pt->entries[index]));
     }
-
     return (virtual_addr_t)table;
 }
 
 void VMM::MapPages(page_table_t* p4, logical_addr_t addr, physical_addr_t p_addr, size_t size, uint8_t flags) {
     uint64_t addr_limit = addr + size;
 
-    // vaddr -> (vaddr + size)
+    // for vaddr -> (vaddr + size)
     for (; addr < addr_limit; addr += PAGE_SIZE) {
-        // VMM_DEBUG_LOG("map 0x%016p -> 0x%016p", addr, p_addr);
-
         // Find the entry corresponding to the logical address addr
         page_entry_t* entry = FindEntry(p4, addr, true);
         if (entry == nullptr) { panic("vmm: Unable to map page, unable to find entry"); }
 
         // Check if the entry is present
         if (entry->data & VMM_PAGE_PRESENT) {
+            // TODO: Log address it's mapped to and display PDE, as well as physical address.
             KernelLog::Get().Log("vmm", "Attempting to map 0x%016p, which is already mapped.", addr);
             panic("vmm: Attempted to remap a page!");
         }
 
         // Map the (now) virtual address addr to p_addr. Mark the pages with the provided flags
         entry->data = p_addr | flags;
-
         p_addr += PAGE_SIZE;
     }
 }
@@ -133,11 +129,10 @@ void* VMM::Map(void* address, size_t length, int perm, int flags) {
     if (address == NULL) {
         // Choose an address
         logical_addr_t address_choose_base = 0;
-        if ((flags & VMM_MAP_KERNEL) != 0) { 
-            address_choose_base = MEM_PHYS_TO_VIRT(0) + pAddr; 
-        }
-        else {
-            // Unimplemented
+        if ((flags & VMM_MAP_KERNEL) != 0) {
+            address_choose_base = MEM_PHYS_TO_VIRT(0) + pAddr;
+        } else {
+            // TODO: Unimplemented
             address_choose_base = 0;
         }
         address = (void*)(address_choose_base);  // TODO: Implement correctly
@@ -148,6 +143,7 @@ void* VMM::Map(void* address, size_t length, int perm, int flags) {
     SwitchMemorySpace(kernelP4);  // Flush TLB
     return address;
 }
+
 void* VMM::Unmap(void* address, size_t length) { return address; }
 
 void VMM::SwitchMemorySpace(page_table_t* newMemorySpace) {

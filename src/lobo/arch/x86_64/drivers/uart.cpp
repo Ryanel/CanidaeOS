@@ -1,9 +1,9 @@
-#include "drivers/x86_64/uart.h"
+#include "kernel/arch/x86_64/drivers/uart.h"
 
 #include <stddef.h>
 #include <stdint.h>
 
-#include "x86_64/ports.h"
+#include "kernel/arch/x86_64/ports.h"
 
 void UARTLoggingDevice::PrintChar(const char c) {
     const uint16_t port = 0x3f8;

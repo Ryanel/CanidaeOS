@@ -2,6 +2,11 @@
 
 Lobo is a pure 64-bit hybrid kernel. Most services will run in Userspace.
 
+## Requirements
+* 64-bit CPU
+* 8MB of memory.
+* x86: APIC. 
+
 ## Features
 * Boots from AWD in 64-bit mode.
 * VGA Output

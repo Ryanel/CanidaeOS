@@ -1,4 +1,4 @@
-#include "x86_64/ports.h"
+#include <kernel/arch/x86_64/ports.h>
 
 // Outputs a byte to port
 void outb(uint16_t port, uint8_t value) {
