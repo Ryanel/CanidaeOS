@@ -35,17 +35,17 @@ void vmm::init(awd_info_t* awd_info) {
 }
 
 void vmm::init_kernel_page_directory(awd_info_t* awd_info) {
-    kernel_pdir = (page_table_t*)kmalloc_aligned(0x1000, 0x1000);
-    memset(kernel_pdir, 0, PAGE_SIZE);
+    pdir_kernel = (page_table_t*)kmalloc_aligned(0x1000, 0x1000);
+    memset(pdir_kernel, 0, PAGE_SIZE);
 
     const uint8_t flags = (VMM_PAGE_PRESENT | VMM_PAGE_WRITE);
 
-    map_pages(kernel_pdir, 0xfffffffff8000000, MEM_VIRT_TO_PHYS(0xfffffffff8000000), 0x200000, flags);  // 0MB -> 2MB
-    map_pages(kernel_pdir, 0xfffffffff8200000, MEM_VIRT_TO_PHYS(0xfffffffff8200000), 0x200000, flags);  // 2MB -> 4MB
+    map_pages(pdir_kernel, 0xffffffff80000000, MEM_VIRT_TO_PHYS(0xffffffff80000000), 0x200000, flags);  // 0MB -> 2MB
+    map_pages(pdir_kernel, 0xffffffff80200000, MEM_VIRT_TO_PHYS(0xffffffff80200000), 0x200000, flags);  // 2MB -> 4MB
+    pdir_current = pdir_kernel;
+    swap_page_directory(pdir_kernel);
 
-    swap_page_directory(kernel_pdir);
-
-    VMM_DEBUG_LOG("Switched to Kernel Page Table 0x%016p", kernel_pdir);
+    VMM_DEBUG_LOG("Switched to Kernel Page Table 0x%016p", pdir_kernel);
 }
 
 page_entry_t* vmm::find_page_entry(page_table_t* p4, logical_addr_t addr, bool create) {
@@ -105,6 +105,7 @@ void vmm::map_pages(page_table_t* p4, logical_addr_t addr, physical_addr_t p_add
 
     // for vaddr -> (vaddr + size)
     for (; addr < addr_limit; addr += PAGE_SIZE) {
+        // KernelLog::Get().Log("vmm", "Map 0x%016p", addr);
         // Find the entry corresponding to the logical address addr
         page_entry_t* entry = find_page_entry(p4, addr, true);
         if (entry == nullptr) { panic("vmm: Unable to map page, unable to find entry"); }
@@ -122,12 +123,27 @@ void vmm::map_pages(page_table_t* p4, logical_addr_t addr, physical_addr_t p_add
     }
 }
 
+void vmm::unmap_pages(page_table_t* p4, logical_addr_t addr, size_t size) {
+    uint64_t addr_limit = addr + size;
+
+    // for vaddr -> (vaddr + size)
+    for (; addr < addr_limit; addr += PAGE_SIZE) {
+        // KernelLog::Get().Log("vmm", "Unmap 0x%016p", addr);
+        // Find the entry corresponding to the logical address addr
+        page_entry_t* entry = find_page_entry(p4, addr, true);
+        if (entry == nullptr) { panic("vmm: Unable to map page, unable to find entry"); }
+
+        // Map the (now) virtual address addr to p_addr. Mark the pages with the provided flags
+        entry->data = VMM_PAGE_WRITE;
+    }
+}
+
 // Attempts to map length / 0x1000 physical pages to address in the current address space
-void* vmm::map(void* address, size_t length, int perm, int flags) {
+void* vmm::map(void* desired_vaddr, size_t length, int perm, int flags) {
     physical_addr_t pAddr = pmm::get().allocate((length / 0x1000));
 
-    if (address == NULL) {
-        // Choose an address
+    // Pick an address if needed
+    if (desired_vaddr == NULL) {
         logical_addr_t address_choose_base = 0;
         if ((flags & VMM_MAP_KERNEL) != 0) {
             address_choose_base = MEM_PHYS_TO_VIRT(0) + pAddr;
@@ -135,26 +151,41 @@ void* vmm::map(void* address, size_t length, int perm, int flags) {
             // TODO: Unimplemented
             address_choose_base = 0;
         }
-        address = (void*)(address_choose_base);  // TODO: Implement correctly
+        desired_vaddr = (void*)(address_choose_base);  // TODO: Implement correctly
     }
     // Check to see if address is not clobbered.
     // Address is now a valid page-aligned address, and some RAM will be allocated.
-    map_pages(kernel_pdir, (logical_addr_t)address, (physical_addr_t)pAddr, length, perm);
-    swap_page_directory(kernel_pdir);  // Flush TLB
+    map_pages(pdir_current, (logical_addr_t)desired_vaddr, (physical_addr_t)pAddr, length, perm);
+    swap_page_directory(pdir_current);  // Flush TLB
+    return desired_vaddr;
+}
+
+void* vmm::map_direct(void* phys, void* virt, size_t length, int perm, int flags) {
+    map_pages(pdir_current, (logical_addr_t)virt, (physical_addr_t)phys, length, perm);
+    swap_page_directory(pdir_current);  // Flush TLB
+    return virt;
+}
+
+void* vmm::map_kernel(physical_addr_t address, size_t length, int perm, int flags) {
+    uint64_t logical_address = (uint64_t)&KERNEL_VMB + address;
+    return map_direct((void*)address, (void*)logical_address, length, perm, flags);
+}
+
+void* vmm::unmap(void* address, size_t length) {
+    unmap_pages(pdir_current, (logical_addr_t)address, length);
+    swap_page_directory(pdir_current);  // Flush TLB
     return address;
 }
 
-void* vmm::unmap(void* address, size_t length) { return address; }
-
 void vmm::swap_page_directory(page_table_t* newMemorySpace) {
     physical_addr_t phys_addr = MEM_VIRT_TO_PHYS(newMemorySpace);
+    asm("cli");  // TODO: Replace with real lock
+    pdir_current = newMemorySpace;
     asm volatile("movq %0, %%cr3;" ::"r"(phys_addr));
+    asm("sti");  // TODO: Replace with real unlock
 }
 
-void vmm::invalidate() {
-    // TODO: Implement
-    //asm volatile("movq %%cr3, %%cr3;");
-}
+void vmm::invalidate() { swap_page_directory(pdir_current); }
 
 void vmm::invalidate(uint64_t addr) { asm volatile("invlpg (%0)" ::"r"(addr) : "memory"); }
 
@@ -164,4 +195,3 @@ void vmm::invalidate(uint64_t start_addr, uint64_t end_addr) {
         start_addr += 0x1000;
     }
 }
-

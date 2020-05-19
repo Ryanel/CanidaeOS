@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include "stdio.h"
 
+#include <kernel/mem/memmap.h>
 #include "kernel/cpu.h"
 #include "kernel/heap.h"
 #include "kernel/kernel.h"
@@ -10,7 +11,6 @@
 #include "kernel/pmm.h"
 #include "kernel/scheduler.h"
 #include "kernel/vmm.h"
-
 using namespace kernel;
 
 void kernel_main() {
@@ -21,9 +21,9 @@ void kernel_main() {
 
     kLog.Log("lobo", "Entered Kernel Main");
 
-    heap_init_full();                  // Initialise the heap
+    heap_init_full();                     // Initialise the heap
     kernelPmm.debug_print_free_memory();  // Print how much memory was used
-    kernelSched.Init();                // Initialise the scheduler
+    kernelSched.Init();                   // Initialise the scheduler
 
     // Idle thread
     kLog.Log("lobo", "Idle thread");

@@ -26,7 +26,7 @@ void Scheduler::Init() {
     // Setup the kernel idle task...
     idleThread.stack_top = 0;  // RSP will be filled in from the task switching function
     idleThread.taskName  = "k/idle";
-    idleThread.vas       = MEM_VIRT_TO_PHYS(vmm().get().kernel_pdir);
+    idleThread.vas       = MEM_VIRT_TO_PHYS(vmm().get().pdir_kernel);
 
     // We're currently in the "idle task"
     currentThread = &idleThread;
@@ -52,7 +52,7 @@ ThreadControlBlock* Scheduler::CreateThread(const char* name, void* function) {
 
     toCreate->taskName  = name;                      // Set name
     toCreate->stack_top = stackAddr - (0x8 * 0x10);  // Set rsp, as if we're in the middle of switch_thread
-    toCreate->vas       = MEM_VIRT_TO_PHYS(vmm().get().kernel_pdir);
+    toCreate->vas       = MEM_VIRT_TO_PHYS(vmm().get().pdir_kernel);
 
     uint64_t* newStack = (uint64_t*)(toCreate->stack_top);
     newStack[0x00]     = 0;                    // r15

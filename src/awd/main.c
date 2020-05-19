@@ -99,14 +99,14 @@ void awd_main(uint32_t mb_magic) {
 
     // Map the next 2MB, for use by the kernel's initial page mapping code.
     paging_map_region(0x200000, 0x400000, 0x200000, 0x400000);
-    paging_map_region(0x200000, 0x400000, (0xFFFFFFFFF8000000 + 0x200000), (0xFFFFFFFFF8000000 + 0x400000));
+    paging_map_region(0x200000, 0x400000, (0xffffffff80000000 + 0x200000), (0xffffffff80000000 + 0x400000));
 
     // Load kernel
     loaded_kernel_info_t kernel = awd_load();
 
     // Identity map the first 2 MB, then commit
     paging_map_region(0, 0x200000, 0, 0x200000);
-    paging_map_region(0, 0x200000, (0xFFFFFFFFF8000000 + 0x000000), (0xFFFFFFFFF8000000 + 0x200000));
+    paging_map_region(0, 0x200000, (0xffffffff80000000 + 0x000000), (0xffffffff80000000 + 0x200000));
 
     paging_commit();
 

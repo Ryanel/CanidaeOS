@@ -2,8 +2,9 @@ ENTRY (_start)
 
 SECTIONS
 {
-	KERNEL_VMB = 0xFFFFFFFFF8000000;
-	KERNEL_VMA = KERNEL_VMB + 0x200000;
+	KERNEL_VMB = 0xffffffff80000000;
+	KERNEL_VMA = 0xffffffff80200000;
+	
 	. = KERNEL_VMA;
 
 	_kernel_start = .;
