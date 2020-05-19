@@ -56,7 +56,7 @@ uint64_t pmm::allocate(uint64_t numContiguous) {
         idx++;
     }
 
-    KernelLog::Get().Log("pmm", "Out of memory, no physical fragment of size %d", numContiguous);
+    log::Get().Log("pmm", "Out of memory, no physical fragment of size %d", numContiguous);
     panic("PMM Out of Memory");
     return 0;
 }
@@ -75,7 +75,7 @@ bool pmm::bitmap_test(uint64_t physAddress) { return bitmap.test(physAddress / 0
 
 void pmm::debug_print_free_pages() {
     uint64_t numFreePages = 0;
-    auto&    kLog         = KernelLog::Get();
+    auto&    kLog         = log::Get();
     for (size_t i = 0; i < m_numPages; i++) {
         uint64_t address = i * 0x1000;
         if (test(address) == false) {
@@ -92,7 +92,7 @@ void pmm::debug_print_free_pages() {
 
 void pmm::debug_print_free_memory() {
     uint64_t numFreePages = 0;
-    auto&    kLog         = KernelLog::Get();
+    auto&    kLog         = log::Get();
     for (size_t i = 0; i < m_numPages; i++) {
         uint64_t address = i * 0x1000;
         if (test(address) == false) {

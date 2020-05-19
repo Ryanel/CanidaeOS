@@ -8,7 +8,9 @@
 #define VMM_PAGE_WRITE 0x02
 #define VMM_PAGE_USER 0x04
 
-#define VMM_MAP_KERNEL 0x400
+#define VMM_MAP_UNBACKED 0x1       ///< Do not attempt to allocate memory.
+#define VMM_MAP_REGION_KERNEL 0x2  ///< Forces the allocated region to be within the kernel address space
+#define VMM_MAP_FIXED 0x4          ///< Forces the virtual address to be exact, or panic().
 
 #define PAGE_SIZE 0x1000
 
@@ -18,6 +20,8 @@ typedef uint64_t physical_addr_t;  /// A physical RAM address
 typedef uint64_t logical_addr_t;   /// An unmapped virtual address
 typedef uint64_t virtual_addr_t;   /// A mapped virtual address
 
+namespace kernel {
+
 typedef struct page_entry {
     physical_addr_t data;
 } page_entry_t;
@@ -26,7 +30,6 @@ typedef struct page_table {
     physical_addr_t entries[512];
 } page_table_t;
 
-namespace kernel {
 /**
  * \brief The Kernel's Virtual Memory Manager
  * Manages the Virtual Memory and Page Tables of the Kernel and CPU.
@@ -53,24 +56,23 @@ class vmm {
      *
      * \param address The starting virtual address to map
      * \param length The number of following bytes to map.
+     * \param perm Page permissions OR'd together
+     * \param flags VMM mapping flags OR'd together. 
      * \see unmap()
      */
     void* map(void* address, size_t length, int perm, int flags);
-
     /**
-     * Maps \a address and the following \a length bytes to the current memory space
+     * Attempts a direct mapping between \a v_addr and \a p_addr in the current memory space
+     * \warning There is no attempt to check if v_addr is already mapped. Will panic() if it attempts to re-map.4
      *
-     * \param address The starting virtual address to map
+     * \param v_addr The virtual address to map
+     * \param p_addr The physical address to map
      * \param length The number of following bytes to map.
+     * \param perm Page permissions OR'd together
+     * \param flags VMM mapping flags OR'd together. 
      * \see unmap()
      */
-    void* map_direct(void* phys, void* virt, size_t length, int perm, int flags);
-
-    /**
-     * Maps \a address and the following \a length bytes to the current memory space, into the kernel memory space.
-     */
-    void* map_kernel(physical_addr_t address, size_t length, int perm, int flags);
-
+    void* map_direct(void* v_addr, void* p_addr, size_t length, int perm, int flags);
     /**
      * Unmaps \a address and the following \a length bytes from the current memory space.
      *
@@ -78,7 +80,7 @@ class vmm {
      * \param length The number of following bytes to unmap.
      * \see map()
      */
-    void* unmap(void* address, size_t length);
+    int unmap(void* address, size_t length);
 
     /**
      * Changes the active memory space of the calling thread to \a newMemorySpace.
@@ -123,6 +125,5 @@ class vmm {
     void map_pages(page_table_t* dir, logical_addr_t v_addr, physical_addr_t p_addr, size_t size, uint8_t flags);
 
     void unmap_pages(page_table_t* dir, logical_addr_t v_addr, size_t size);
-
 };
 };  // namespace kernel

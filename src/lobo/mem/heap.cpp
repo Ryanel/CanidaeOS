@@ -6,10 +6,11 @@
 #include "kernel/log.h"
 #include "kernel/panic.h"
 #include "kernel/pmm.h"
+#include "kernel/kernel.h"
 
-#include "kernel/mem/liballoc.h"
+using namespace kernel;
 
-//#define KERNEL_HEAP_DEBUG_PRINT
+#define KERNEL_HEAP_DEBUG_PRINT
 
 enum class AllocMode { Uninitialised, EarlyBoot, Full };
 
@@ -29,7 +30,6 @@ void heap_early_init(uintptr_t base, uintptr_t limit) {
 void heap_init_full() {
     // Allocate enough starting space...
     // Prime the allocator
-    k_extern_liballoc_malloc(0);
     currentMode = AllocMode::Full;
 }
 
@@ -40,8 +40,25 @@ void* kmalloc_page(size_t sz) { return kmalloc_aligned(sz, 0x1000); }
 
 void* kmalloc_aligned(size_t sz, size_t alignment) {
     if (currentMode == AllocMode::Full) {
-        // Alright, we need to allocate some space...
-        return k_extern_liballoc_malloc(sz);
+        //TODO: Write custom heap implementation
+        asm("cli");
+
+        uint64_t old_base = earlyAllocBase;
+        if ((earlyAllocBase % alignment) != 0) { earlyAllocBase += alignment - (earlyAllocBase % alignment); }
+        uint64_t block       = earlyAllocBase;
+        uint64_t new_current = earlyAllocBase + sz;
+
+        if (new_current > earlyAllocLimit) { panic("kmalloc(early): Ran out of memory!"); }
+
+        if((old_base & 0xFFFFFFFFFFFFF000) != (new_current & 0xFFFFFFFFFFFFF000)) {
+            pmm::get().set((new_current & 0xFFFFFFFFFFFFF000) - (uint64_t)&KERNEL_VMB);
+        }
+
+        earlyAllocBase = new_current;
+
+        asm("sti");
+
+        return (void*)(block);
 
     } else if (currentMode == AllocMode::EarlyBoot) {
         // During Early Boot, we do not have paging. Do not interact with the VMM, simply allocate space...
@@ -53,7 +70,7 @@ void* kmalloc_aligned(size_t sz, size_t alignment) {
         earlyAllocBase = new_current;
 
         #ifdef KERNEL_HEAP_DEBUG_PRINT
-        KernelLog::Get().Log("kmalloc", "alloc 0x%x bytes @ 0x%p", sz, block);
+        log::Get().Log("kmalloc", "alloc 0x%x bytes @ 0x%p", sz, block);
         #endif
 
         return (void*)(block);

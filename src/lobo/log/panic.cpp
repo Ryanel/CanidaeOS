@@ -2,20 +2,22 @@
 #include "kernel/log.h"
 #include "kernel/cpu.h"
 
+using namespace kernel;
+
 extern "C" void panic(const char* fmt, ...) {
     va_list arg;
 
     va_start(arg, fmt);
-    KernelLog::Get().Log("panic", fmt, arg);
+    log::Get().Log("panic", fmt, arg);
     va_end(arg);
     
-    kernel::cpu::HaltCPU();
+    cpu::HaltCPU();
 }
 
 #if DEBUG
 
 void _assert(const char * expression, const char * file, const char * function, int line) {
-    KernelLog::Get().Log("assert", "\"%s\" failed\nIn file %s, on line %d\nIn function \"%s\"", expression, file, line, function);
+    log::Get().Log("assert", "\"%s\" failed\nIn file %s, on line %d\nIn function \"%s\"", expression, file, line, function);
     panic("Assertion failed");
 }
 

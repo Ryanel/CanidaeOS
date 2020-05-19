@@ -3,7 +3,7 @@ ENTRY (_start)
 SECTIONS
 {
 	KERNEL_VMB = 0xffffffff80000000;
-	KERNEL_VMA = 0xffffffff80200000;
+	KERNEL_VMA = KERNEL_VMB + 0x200000;
 	
 	. = KERNEL_VMA;
 

@@ -2,7 +2,7 @@
 #include "kernel/log.h"
 #include <stdint.h>
 
-class VGAConsoleDevice : public IKernelLogTerminalOutDevice {
+class VGAConsoleDevice : public kernel::IKernelLogTerminalOutDevice {
    public:
     void Init(int curX, int curY);
     void PrintChar(const char c);

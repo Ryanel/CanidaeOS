@@ -14,14 +14,12 @@
 using namespace kernel;
 
 void kernel_main() {
-    auto& kLog        = KernelLog::Get();
+    auto& kLog        = log::Get();
     auto& kernelPmm   = kernel::pmm::get();
     auto& kernelVmm   = kernel::vmm::get();
     auto& kernelSched = kernel::scheduling::Scheduler::Get();
 
-    kLog.Log("lobo", "Entered Kernel Main");
-
-    heap_init_full();                     // Initialise the heap
+    kLog.Log("lobo", "Entered Kernel Main"); 
     kernelPmm.debug_print_free_memory();  // Print how much memory was used
     kernelSched.Init();                   // Initialise the scheduler
 

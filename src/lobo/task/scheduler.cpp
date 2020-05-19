@@ -18,7 +18,7 @@ Scheduler& Scheduler::Get() { return kernel_sched; }
 void Scheduler::PrintTaskInfo(ThreadControlBlock* tcb) {
     assert(tcb != nullptr);
 
-    auto& kLog = KernelLog::Get();
+    auto& kLog = log::Get();
     kLog.Log("sched", "Task %s: VAS: 0x%016p, Stack: 0x%016p", tcb->taskName, tcb->vas, tcb->stack_top);
 }
 
@@ -46,7 +46,7 @@ void Scheduler::SwitchThread(ThreadControlBlock* newThread) {
 ThreadControlBlock* Scheduler::CreateThread(const char* name, void* function) {
     ThreadControlBlock* toCreate = (ThreadControlBlock*)kmalloc(sizeof(ThreadControlBlock));
 
-    KernelLog::Get().Log("thread", "Creating thread %s => 0x%16p", name, function);
+    log::Get().Log("thread", "Creating thread %s => 0x%16p", name, function);
 
     uint64_t stackAddr = (uint64_t)kmalloc(THREAD_STACK_SIZE) + THREAD_STACK_SIZE;
 

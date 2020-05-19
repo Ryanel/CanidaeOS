@@ -9,6 +9,8 @@
 idt_table_entry_t table_idt[256] __attribute__((aligned(0x1000)));
 idt_table_ptr_t   table_idt_ptr;
 
+using namespace kernel;
+
 const char* exception_strings[] = {"Divide By Zero",
                                    "Debug",
                                    "NMI",
@@ -42,7 +44,7 @@ const char* exception_strings[] = {"Divide By Zero",
                                    "Reserved"};
 
 extern "C" void fault_handler(struct InterruptContext* r) {
-    auto& log = KernelLog::Get();
+    auto& log = log::Get();
     // KernelLog::Get().Log("int", "Caught an interrupt! %d, error %p", r->int_no, r->err_code);
 
     if (r->int_no < 32) {
@@ -68,7 +70,7 @@ extern "C" void fault_handler(struct InterruptContext* r) {
 }
 
 extern "C" void interrupt_handler(struct InterruptContext* r) {
-    auto& log            = KernelLog::Get();
+    auto& log            = log::Get();
     bool  eoi_sent_early = false;
 
     // Print out any IRQ that's not IRQ 0
@@ -107,7 +109,7 @@ idt_table_entry_t idt_populate_entry(uint64_t entry, uint16_t cs_selector, uint8
 }
 
 void init_idt() {
-    auto& kernelLog = KernelLog::Get();
+    auto& kernelLog = log::Get();
     kernelLog.Log("int", "Initialising interrupts");
     // Fill with non-present data
     memset(&table_idt, 0, sizeof(idt_table_entry_t) * 256);
