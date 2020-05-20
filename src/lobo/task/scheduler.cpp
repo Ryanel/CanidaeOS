@@ -1,6 +1,5 @@
 #include <kernel/scheduler.h>
 #include <assert.h>
-#include <kernel/kconfig.h>
 #include <kernel/heap.h>
 #include <kernel/kernel.h>
 #include <kernel/log.h>

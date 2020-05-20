@@ -6,7 +6,7 @@
 #define AWD_MEMMAP_FREE 0
 #define AWD_MEMMAP_USED 1
 
-typedef struct {
+typedef struct awd_info {
     // Kernel Info
     uint32_t kernel_phstart;
     uint32_t kernel_phsize;

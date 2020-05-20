@@ -1,5 +1,5 @@
 #pragma once
-#include "kernel/log.h"
+#include <kernel/log_devices.h>
 #include <stdint.h>
 
 class VGAConsoleDevice : public kernel::IKernelLogTerminalOutDevice {
@@ -8,10 +8,10 @@ class VGAConsoleDevice : public kernel::IKernelLogTerminalOutDevice {
     void PrintChar(const char c);
     void Clear();
     void FormatSetLeftColumn(int column);
+
    private:
     void AttemptScroll();
 
-   private:
     uint64_t bufferAddr;
     const int width = 80;
     const int height = 25;

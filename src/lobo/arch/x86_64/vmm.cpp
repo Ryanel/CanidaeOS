@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "awd/awd_info.h"
+#include <awd/awd_info.h>
 
 #include "kernel/heap.h"
 #include "kernel/kernel.h"
@@ -29,13 +29,13 @@ static vmm kernel_vmm;
 
 vmm& vmm::get() { return kernel_vmm; }
 
-void vmm::init(awd_info_t* awd_info) {
+void vmm::init() {
     if (m_init) { return; }
     m_init = true;
-    init_kernel_page_directory(awd_info);
+    init_kernel_page_directory();
 }
 
-void vmm::init_kernel_page_directory(awd_info_t* awd_info) {
+void vmm::init_kernel_page_directory() {
     pdir_kernel = (page_table_t*)kmalloc_aligned(0x1000, 0x1000);
     memset(pdir_kernel, 0, PAGE_SIZE);
 

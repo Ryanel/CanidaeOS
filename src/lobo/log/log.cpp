@@ -1,5 +1,6 @@
-#include "kernel/log.h"
+#include <kernel/log.h>
 
+#include <kernel/log_devices.h>
 #include <stdarg.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -41,7 +42,7 @@ void log::Log(const char* category, const char* fmt, ...) {
 
 void log::LogArg(const char* category, const char* fmt, va_list arg) {
     printf("%9s | ", category);
-    
+
     FormatSetLeftColumn(13);
 
     vprintf(fmt, arg);
@@ -54,22 +55,18 @@ void log::LogArg(const char* category, const char* fmt, va_list arg) {
 void log::LogRaw(const char* fmt, ...) {
     va_list arg;
     va_start(arg, fmt);
-    
+
     vprintf(fmt, arg);
-    
+
     va_end(arg);
 }
 
 int log::FormatSetLeftColumn(int column) {
-    int old = m_fmtLeftColumn;
+    int old         = m_fmtLeftColumn;
     m_fmtLeftColumn = column;
 
-    if(m_terminalOutDevice != nullptr) {
-        m_terminalOutDevice->FormatSetLeftColumn(column);
-    }
-    if(m_serialOutDevice != nullptr) {
-        m_serialOutDevice->FormatSetLeftColumn(column);
-    }
+    if (m_terminalOutDevice != nullptr) { m_terminalOutDevice->FormatSetLeftColumn(column); }
+    if (m_serialOutDevice != nullptr) { m_serialOutDevice->FormatSetLeftColumn(column); }
 
     return old;
 }

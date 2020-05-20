@@ -1,5 +1,6 @@
 #pragma once
-#include "kernel/log.h"
+
+#include <kernel/log_devices.h>
 
 class UARTLoggingDevice : public kernel::IKernelLogTerminalOutDevice {
    public:

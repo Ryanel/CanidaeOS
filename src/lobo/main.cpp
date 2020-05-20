@@ -20,6 +20,7 @@ void kernel_main() {
     auto& kernelSched = kernel::scheduling::Scheduler::Get();
 
     kLog.Log("lobo", "Entered Kernel Main"); 
+
     kernelPmm.debug_print_free_memory();  // Print how much memory was used
     kernelSched.Init();                   // Initialise the scheduler
 

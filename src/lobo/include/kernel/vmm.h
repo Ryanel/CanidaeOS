@@ -2,8 +2,6 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include "awd/awd_info.h"
-
 #define VMM_PAGE_PRESENT 0x01
 #define VMM_PAGE_WRITE 0x02
 #define VMM_PAGE_USER 0x04
@@ -40,11 +38,11 @@ class vmm {
     bool          m_init       = false;    ///< Is the PMM initialised?
     page_table_t* pdir_kernel  = nullptr;  ///< The kernels' embryonic page directory
     page_table_t* pdir_current = nullptr;  ///< The currently loaded page directory
+
     /**
-     * Initialises the Virtual Memory Manager with info from AWD
-     * \param awd_info The AWD info structure
+     * Initialises the Virtual Memory Manager
      */
-    void init(awd_info_t* awd_info);
+    void init();
 
     /**
      * Allows access to the Virtual Memory Manager.
@@ -111,7 +109,7 @@ class vmm {
 
    private:
     /// Initialise the primative kernel page directory
-    void init_kernel_page_directory(awd_info_t* awd_info);
+    void init_kernel_page_directory();
     /// Find a page table entry in \a p4 at logical address \a addr. If the neccisary tables don't exist \a create them
     /// if possible.
     page_entry_t* find_page_entry(page_table_t* p4, logical_addr_t addr, bool create);
