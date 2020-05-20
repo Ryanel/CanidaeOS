@@ -1,5 +1,6 @@
 #include <kernel/arch/x86_64/interrupt_methods.h>
 #include <kernel/arch/x86_64/interrupts.h>
+#include <kernel/arch/x86_64/drivers/ps2_keyboard.h>
 #include <kernel/arch/x86_64/ports.h>
 #include <kernel/cpu.h>
 #include <kernel/log.h>
@@ -74,17 +75,19 @@ extern "C" void interrupt_handler(struct InterruptContext* r) {
     bool  eoi_sent_early = false;
 
     // Print out any IRQ that's not IRQ 0
-    if (r->int_no != 32) {
-        log.Log("int", "Recieved IRQ %d, handled.", (r->int_no - 32));
-    } else {
+    if (r->int_no == 32) {
         // Timer interrupt
         eoi_sent_early = true;
-
         if (r->int_no >= 40) { outb(0xA0, 0x20); }
         outb(0x20, 0x20);
-
         asm("sti");  // Enable interrupts again, so we can recieve an interrupt
         kernel::scheduling::Scheduler::Get().Schedule();
+
+    } else if (r->int_no == 33) {
+        ps2_keyboard kbd;
+        kbd.on_interrupt();
+    } else {
+        log.Log("int", "Recieved IRQ %d, handled.", (r->int_no - 32));
     }
 
     // End of Interrupt to PIC (and slave)

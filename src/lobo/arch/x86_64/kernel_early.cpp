@@ -14,6 +14,8 @@
 
 #include "kernel/arch/x86_64/drivers/uart.h"
 #include "kernel/arch/x86_64/drivers/vga_console.h"
+#include <kernel/arch/x86_64/drivers/ps2_keyboard.h>
+#include <kernel/driver_registry.h>
 
 using namespace kernel;
 
@@ -22,7 +24,7 @@ void kernel_version_print();
 
 UARTLoggingDevice boot_serial_logger_device;
 VGAConsoleDevice  boot_vga_console_device;
-
+ps2_keyboard boot_ps2_keyboard_drv;
 void init_memory(awd_info_t* awd_info) {
     auto& kernelLog = log::Get();
     auto& kernelPmm = pmm::get();
@@ -95,9 +97,16 @@ extern "C" void kernel_early(awd_info_t* awd_info) {
     init_idt();
 
     // Step 6: Initialise memory
-    kernelVmm.init();                                      // Initialise paging structures...
+    kernelVmm.init();                              // Initialise paging structures...
     init_memory((awd_info_t*)MEM_PHYS_TO_VIRT(awd_info));  // Initialise the PMM
-    heap_init_full();                                      // Initialise the heap
+    heap_init_full();   
+    
+    // Step 7: Add to driver registry...
+    drivers::driver_registry::get().add(&boot_serial_logger_device);
+    drivers::driver_registry::get().add(&boot_vga_console_device);
+    drivers::driver_registry::get().add(&boot_ps2_keyboard_drv);
+    
+    // Initialise the heap
     // Architecture specific setup finished, boot into kernel main...
     kernel_main();
 }

@@ -1,7 +1,8 @@
 #pragma once
-#include <common/bitset.h>
+
 #include <stddef.h>
 #include <stdint.h>
+#include <common/bitset.h>
 
 namespace kernel {
 

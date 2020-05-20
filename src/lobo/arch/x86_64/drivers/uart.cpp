@@ -40,3 +40,6 @@ void UARTLoggingDevice::FormatSetLeftColumn(int column) {
     // Does nothing
     leftColumn = column;
 }
+
+void UARTLoggingDevice::init() {}
+void UARTLoggingDevice::call() {}

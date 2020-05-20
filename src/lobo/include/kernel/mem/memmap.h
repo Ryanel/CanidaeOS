@@ -1,8 +1,8 @@
 #pragma once
 
 #include <assert.h>
-#include <kernel/log.h>
 #include <kernel/vmm.h>
+//#include <kernel/log.h>
 
 namespace kernel {
 /**

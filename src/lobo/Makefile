@@ -10,8 +10,10 @@ ASM_FLAGS := -felf64
 WARNING_FLAGS := -Wall -Wextra -Wfloat-equal -Wundef -Wcast-align -Wwrite-strings -Wlogical-op -Wredundant-decls -Wshadow -Wno-unused-parameter
 CPU_FEATURE_FLAGS := -mno-red-zone -mno-mmx -mno-sse -mno-sse2 -fno-omit-frame-pointer 
 
-FEATURE_FLAGS := -fstack-protector -D __is_kernel -D DEBUG
-SHARED_FLAGS := -m64 -ffreestanding -mcmodel=kernel -Og -g -MMD -z max-page-size=0x1000 \
+#DEBUG_FLAGS := -D DEBUG -Og -g
+OPTIMIZATION_FLAGS:= -Os
+FEATURE_FLAGS := -fstack-protector -D __is_kernel
+SHARED_FLAGS := -m64 -ffreestanding -mcmodel=kernel $(OPTIMIZATION_FLAGS) -MMD -z max-page-size=0x1000 \
  --sysroot=$(DIR_SYSROOT) -I$(DIR_SYSROOT)/usr/include/ -I$(DIR_SOURCE)/include/ \
  $(CPU_FEATURE_FLAGS) $(FEATURE_FLAGS) $(WARNING_FLAGS) -nostdlib
 

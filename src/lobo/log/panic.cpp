@@ -14,7 +14,7 @@ extern "C" void panic(const char* fmt, ...) {
     cpu::HaltCPU();
 }
 
-#if DEBUG
+#ifdef DEBUG
 
 void _assert(const char * expression, const char * file, const char * function, int line) {
     log::Get().Log("assert", "\"%s\" failed\nIn file %s, on line %d\nIn function \"%s\"", expression, file, line, function);
