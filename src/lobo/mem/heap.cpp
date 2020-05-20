@@ -10,7 +10,7 @@
 
 using namespace kernel;
 
-#define KERNEL_HEAP_DEBUG_PRINT
+//#define KERNEL_HEAP_DEBUG_PRINT
 
 enum class AllocMode { Uninitialised, EarlyBoot, Full };
 

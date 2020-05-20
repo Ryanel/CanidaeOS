@@ -11,6 +11,7 @@
 #define VMM_MAP_UNBACKED 0x1       ///< Do not attempt to allocate memory.
 #define VMM_MAP_REGION_KERNEL 0x2  ///< Forces the allocated region to be within the kernel address space
 #define VMM_MAP_FIXED 0x4          ///< Forces the virtual address to be exact, or panic().
+#define VMM_MAP_PHYS 0x8           ///< Address is a physical address, map it to any virtual address.
 
 #define PAGE_SIZE 0x1000
 
@@ -57,7 +58,7 @@ class vmm {
      * \param address The starting virtual address to map
      * \param length The number of following bytes to map.
      * \param perm Page permissions OR'd together
-     * \param flags VMM mapping flags OR'd together. 
+     * \param flags VMM mapping flags OR'd together.
      * \see unmap()
      */
     void* map(void* address, size_t length, int perm, int flags);
@@ -69,7 +70,7 @@ class vmm {
      * \param p_addr The physical address to map
      * \param length The number of following bytes to map.
      * \param perm Page permissions OR'd together
-     * \param flags VMM mapping flags OR'd together. 
+     * \param flags VMM mapping flags OR'd together.
      * \see unmap()
      */
     void* map_direct(void* v_addr, void* p_addr, size_t length, int perm, int flags);

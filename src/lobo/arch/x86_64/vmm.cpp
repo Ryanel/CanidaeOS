@@ -43,7 +43,7 @@ void vmm::init_kernel_page_directory(awd_info_t* awd_info) {
 
     map_pages(pdir_kernel, 0xffffffff80000000, MEM_VIRT_TO_PHYS(0xffffffff80000000), 0x200000, flags);  // 0MB -> 2MB
     map_pages(pdir_kernel, 0xffffffff80200000, MEM_VIRT_TO_PHYS(0xffffffff80200000), 0x200000, flags);  // 2MB -> 4MB
-    
+
     pdir_current = pdir_kernel;
     swap_page_directory(pdir_kernel);
 
@@ -80,7 +80,8 @@ page_entry_t* vmm::find_page_entry(page_table_t* p4, logical_addr_t addr, bool c
     uint64_t ent_address = (uint64_t)(&(p1->entries[index_p1]));
     auto     res         = (page_entry_t*)ent_address;
 
-    //VMM_DEBUG_LOG("walk 4[%03d]-> 3[%03d]-> 2[%03d]-> 1[%03d] @ 0x%016p", index_p4, index_p3, index_p2, index_p1, res);
+    // VMM_DEBUG_LOG("walk 4[%03d]-> 3[%03d]-> 2[%03d]-> 1[%03d] @ 0x%016p", index_p4, index_p3, index_p2, index_p1,
+    // res);
 
     return res;
 }
@@ -106,7 +107,7 @@ void vmm::map_pages(page_table_t* p4, logical_addr_t addr, physical_addr_t p_add
 
     // for vaddr -> (vaddr + size)
     for (; addr < addr_limit; addr += PAGE_SIZE) {
-        //log::Get().Log("vmm", "Map 0x%016p -> 0x%016p", addr, p_addr);
+        // log::Get().Log("vmm", "Map 0x%016p -> 0x%016p", addr, p_addr);
         // Find the entry corresponding to the logical address addr
         page_entry_t* entry = find_page_entry(p4, addr, true);
         if (entry == nullptr) { panic("vmm: Unable to map page, unable to find entry"); }
@@ -139,19 +140,20 @@ void vmm::unmap_pages(page_table_t* p4, logical_addr_t addr, size_t size) {
 }
 
 // Attempts to map length / 0x1000 physical pages to address in the current address space
-void* vmm::map(void* desired_vaddr, size_t length, int perm, int flags) {
+void* vmm::map(void* desired_addr, size_t length, int perm, int flags) {
     logical_addr_t  l_addr = 0;
     physical_addr_t p_addr = 0;
     pmm&            k_pmm  = pmm::get();
 
     // Set flags
-    bool ram_backed    = (flags & VMM_MAP_UNBACKED) == 0;
-    bool region_kernel = (flags & VMM_MAP_REGION_KERNEL) != 0;
-    bool l_addr_fixed  = (flags & VMM_MAP_FIXED);
-    
+    bool ram_backed       = (flags & VMM_MAP_UNBACKED) == 0;
+    bool region_kernel    = (flags & VMM_MAP_REGION_KERNEL) != 0;
+    bool l_addr_fixed     = (flags & VMM_MAP_FIXED) != 0;
+    bool desired_is_paddr = (flags & VMM_MAP_PHYS) != 0;
+
     // Determine physical address & logical address.
     if (ram_backed) {
-        if (desired_vaddr == 0) {
+        if (desired_addr == 0) {
             p_addr = k_pmm.allocate((length / 0x1000));
 
             if (region_kernel) {
@@ -163,7 +165,7 @@ void* vmm::map(void* desired_vaddr, size_t length, int perm, int flags) {
 
         } else {
             if (region_kernel) {
-                l_addr = (logical_addr_t)desired_vaddr;
+                l_addr = (logical_addr_t)desired_addr;
                 p_addr = (physical_addr_t)MEM_VIRT_TO_PHYS(l_addr);
                 assert(l_addr > (logical_addr_t)&KERNEL_VMB);
             } else {
@@ -172,7 +174,18 @@ void* vmm::map(void* desired_vaddr, size_t length, int perm, int flags) {
             }
         }
     } else {
-        panic("vmm: Unimplemented, no unmapped memory support");
+        if (desired_is_paddr) {
+            p_addr = (physical_addr_t)desired_addr;
+            if (region_kernel) {
+                l_addr = MEM_PHYS_TO_VIRT(p_addr);
+            } else {
+                // TODO: FIX, do not identity map.
+                l_addr = p_addr;
+                // panic("vmm: Unimplemented, no free vmm address finding");
+            }
+        } else {
+            panic("vmm: Unimplemented, no unmapped memory support");
+        }
     }
 
     // TODO: Memory region accounting here
@@ -183,7 +196,7 @@ void* vmm::map(void* desired_vaddr, size_t length, int perm, int flags) {
 
 void* vmm::map_direct(void* v_addr, void* p_addr, size_t length, int perm, int flags) {
     // TODO: Memory region accounting here
-    //VMM_DEBUG_LOG("Map 0x%016p -> 0x%016p (%x)", p_addr, v_addr, length);
+    // VMM_DEBUG_LOG("Map 0x%016p -> 0x%016p (%x)", p_addr, v_addr, length);
     map_pages(pdir_current, (uint64_t)v_addr, (uint64_t)p_addr, length, perm);
     swap_page_directory(pdir_current);  // Flush TLB
     return v_addr;

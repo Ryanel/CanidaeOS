@@ -17,28 +17,34 @@ class memmap {
         uint64_t virt_addr = (uint64_t)vmm::get().map(nullptr, size, perm, flags);
         m_ram_backed       = true;
         addr               = virt_addr;
-        log::Get().Log("memmap", "Constructed random RAM backed memory @ 0x%016p", virt_addr);
     }
     /// Allocate some physically backed memory at address that's \a size long
     memmap(uint64_t address, size_t size, int perm, int flags) : addr(address), sz(size) {
-        uint64_t allocated_virt_address = (uint64_t)vmm::get().map((void*)address, size, perm, flags);
-        m_ram_backed                    = true;
-        log::Get().Log("memmap", "Constructed RAM backed memory @ 0x%016p", allocated_virt_address);
+        uint64_t virt_addr = (uint64_t)vmm::get().map((void*)address, size, perm, flags);
+        m_ram_backed       = true;
+        addr               = virt_addr;
     }
 
     /// Map p_addr to v_addr
     memmap(uint64_t p_addr, uint64_t v_addr, size_t size, int perm, int flags) : addr(v_addr), sz(size) {
-        uint64_t allocated_virt_address =
-            (uint64_t)vmm::get().map_direct((void*)v_addr, (void*)p_addr, size, perm, flags);
+        vmm::get().map_direct((void*)v_addr, (void*)p_addr, size, perm, flags);
         m_ram_backed = false;
         this->addr   = v_addr;
         this->sz     = size;
-        log::Get().Log("memmap", "Direct Mapping 0x%016p -> 0x%016p", p_addr, allocated_virt_address);
     }
 
     ~memmap() {
         if (m_ram_backed) {}
         vmm::get().unmap((void*)addr, sz);
+    }
+
+    void* get() const {
+        return (void*)addr;
+    }
+
+    uint8_t& operator[](size_t idx) {
+        assert(idx < sz);
+        return ((uint8_t*)addr)[idx];
     }
 
    private:
