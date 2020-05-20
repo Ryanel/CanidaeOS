@@ -15,6 +15,12 @@
 
 #define VMM_ROUND_DOWN(x) (((x)) & ~(PAGE_SIZE - 1))
 
+#ifdef DEBUG
+#define VMM_DEBUG_LOG(fmt, ...) log::Get().Log("vmm", fmt, __VA_ARGS__)
+#else
+#define VMM_DEBUG_LOG(fmt, ...)
+#endif
+
 typedef uint64_t physical_addr_t;  /// A physical RAM address
 typedef uint64_t logical_addr_t;   /// An unmapped virtual address
 typedef uint64_t virtual_addr_t;   /// A mapped virtual address
