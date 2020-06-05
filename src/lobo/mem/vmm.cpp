@@ -49,7 +49,7 @@ void* vmm::map(void* desired_addr, size_t length, int perm, int flags) {
     // Set flags
     bool ram_backed       = (flags & VMM_MAP_UNBACKED) == 0;
     bool region_kernel    = (flags & VMM_MAP_REGION_KERNEL) != 0;
-    bool l_addr_fixed     = (flags & VMM_MAP_FIXED) != 0;
+    //bool l_addr_fixed     = (flags & VMM_MAP_FIXED) != 0;
     bool desired_is_paddr = (flags & VMM_MAP_PHYS) != 0;
 
     // Determine physical address & logical address.

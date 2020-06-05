@@ -41,7 +41,7 @@ void log::Log(const char* category, const char* fmt, ...) {
 }
 
 void log::LogArg(const char* category, const char* fmt, va_list arg) {
-    printf("%9s | ", category);
+    printf("%8s | ", category);
 
     FormatSetLeftColumn(13);
 
