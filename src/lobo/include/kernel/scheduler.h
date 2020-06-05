@@ -1,16 +1,20 @@
 #pragma once
 
 #include "kernel/task.h"
-
+#include <common/linked_list.h>
 namespace kernel {
 namespace scheduling {
 
 class Scheduler {
    public:
+    bool schedulingEnabled = false;
     ThreadControlBlock  idleThread;
     ThreadControlBlock* currentThread;
 
-    bool schedulingEnabled = false;
+    // TODO: Implement Round-Robin scheduling in a better way.
+    // TODO: Add process support.
+    common::linked_list<ThreadControlBlock*> threads;
+    int currentThreadIndex = 0;
 
    public:
     static Scheduler&   Get();

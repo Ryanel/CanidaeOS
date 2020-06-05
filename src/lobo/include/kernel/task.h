@@ -15,7 +15,6 @@ class ThreadControlBlock {
     uint64_t            vas;        // Virtual address space, page table.
     uint64_t            flags;      // Flags
     const char*         taskName;
-    ThreadControlBlock* next;
 };
 
 };  // namespace Scheduling

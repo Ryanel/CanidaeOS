@@ -30,6 +30,7 @@ void Scheduler::Init() {
     // We're currently in the "idle task"
     currentThread = &idleThread;
     SwitchThread(&idleThread);  // Switch to populate some values.
+    threads.push_back(&idleThread);
 }
 
 void Scheduler::SwitchThread(ThreadControlBlock* newThread) {
@@ -70,6 +71,8 @@ ThreadControlBlock* Scheduler::CreateThread(const char* name, void* function) {
     newStack[0x0D]     = 0;                    // rcx
     newStack[0x0E]     = 0;                    // rax
     newStack[0x0F]     = (uint64_t)function;   // rip
+
+    threads.push_back(toCreate);
     return toCreate;
 }
 
@@ -77,8 +80,17 @@ void Scheduler::EnableScheduling() { schedulingEnabled = true; }
 void Scheduler::DisableScheduling() { schedulingEnabled = false; }
 
 void Scheduler::Schedule() {
-    if (schedulingEnabled && currentThread != nullptr ) {
-        assert(currentThread->next != nullptr);
-        SwitchThread(currentThread->next); 
+    if (!schedulingEnabled) {
+        return;
     }
+
+    int numThreads = threads.m_size;
+    currentThreadIndex++;
+    if(currentThreadIndex >= numThreads) {currentThreadIndex = 0;}
+    auto* start_itr = threads.begin();
+    for(int i = 0; i < currentThreadIndex; i++) {
+        start_itr = start_itr->next;
+    }
+
+    SwitchThread(start_itr->value);
 }

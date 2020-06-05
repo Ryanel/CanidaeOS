@@ -16,29 +16,42 @@
 #include <kernel/driver.h>
 using namespace kernel;
 
+void test_thread() {
+    auto& kLog                 = log::Get();
+    while(true) {
+        kLog.Log("lobo", "Test A");
+    }
+    
+}
+
+void test_thread2() {
+    auto& kLog                 = log::Get();
+    while(true) {
+        kLog.Log("lobo", "Test B");
+    }
+}
+
+
 void kernel_main() {
     auto& kLog                 = log::Get();
     auto& kernelPmm            = kernel::pmm::get();
-    auto& kernelVmm            = kernel::vmm::get();
     auto& kernelSched          = kernel::scheduling::Scheduler::Get();
-    auto& kernelDriverRegistry = kernel::drivers::driver_registry::get();
 
     kLog.Log("lobo", "Entered Kernel Main");
 
     kernelPmm.debug_print_free_memory();  // Print how much memory was used
     kernelSched.Init();                   // Initialise the scheduler
 
-    // Print loaded drivers.
-    auto& drv_list = kernelDriverRegistry.driver_list;
-    auto drv_node = drv_list.begin();
-    kLog.Log("drvreg", "%d Drivers loaded:", kernelDriverRegistry.driver_list.m_size);
-    while(drv_node != nullptr) {
-        assert(drv_node->value != nullptr);
-        kLog.LogRaw("%s ", drv_node->value->m_name);
-        drv_node = drv_node->next;
-    }
-    kLog.LogRaw("\n");
+    //debug::debugger().get().enter();
 
+    kernelSched.CreateThread("k/test", (void*)test_thread);
+    kernelSched.CreateThread("k/test2", (void*)test_thread2);
+
+    kernelSched.EnableScheduling();
+
+    kLog.Log("lobo", "Entered idle thread");
+    while(true) {
+        kLog.Log("lobo", "Idle");
+    }
     cpu::IdleLoop();
-    debug::debugger().get().enter();
 }
