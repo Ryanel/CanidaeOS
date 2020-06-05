@@ -1,8 +1,8 @@
-#include <kernel/scheduler.h>
 #include <assert.h>
 #include <kernel/heap.h>
 #include <kernel/kernel.h>
 #include <kernel/log.h>
+#include <kernel/scheduler.h>
 #include <kernel/task.h>
 #include <kernel/vmm.h>
 
@@ -80,17 +80,12 @@ void Scheduler::EnableScheduling() { schedulingEnabled = true; }
 void Scheduler::DisableScheduling() { schedulingEnabled = false; }
 
 void Scheduler::Schedule() {
-    if (!schedulingEnabled) {
-        return;
-    }
+    if (!schedulingEnabled) { return; }
 
-    int numThreads = threads.m_size;
-    currentThreadIndex++;
-    if(currentThreadIndex >= numThreads) {currentThreadIndex = 0;}
+    if (++currentThreadIndex >= threads.m_size) { currentThreadIndex = 0; }
+
     auto* start_itr = threads.begin();
-    for(int i = 0; i < currentThreadIndex; i++) {
-        start_itr = start_itr->next;
-    }
+    for (int i = 0; i < currentThreadIndex; i++) { start_itr = start_itr->next; }
 
     SwitchThread(start_itr->value);
 }

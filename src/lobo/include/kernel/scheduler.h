@@ -1,7 +1,7 @@
 #pragma once
 
-#include "kernel/task.h"
-#include <common/linked_list.h>
+#include <kernel/task.h>
+#include <common/single_linked_list.h>
 namespace kernel {
 namespace scheduling {
 
@@ -13,8 +13,8 @@ class Scheduler {
 
     // TODO: Implement Round-Robin scheduling in a better way.
     // TODO: Add process support.
-    common::linked_list<ThreadControlBlock*> threads;
-    int currentThreadIndex = 0;
+    common::single_linked_list<ThreadControlBlock*> threads;
+    size_t currentThreadIndex = 0;
 
    public:
     static Scheduler&   Get();
