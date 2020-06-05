@@ -21,7 +21,12 @@ void VGAConsoleDevice::PrintChar(const char c) {
             x = leftColumn;
             y++;
             break;
-
+        case '\b':
+            x -= 1;
+            if(x < leftColumn) { x = leftColumn; }
+            offset = ((y * width) + x) * 2;
+            buffer[offset]  = ' ';
+            break;
         default:
             buffer[offset]     = c;
             buffer[offset + 1] = attribute;
