@@ -13,7 +13,6 @@ enum class TCBState { Ready, Running, Waiting, Dead };
 class ThreadControlBlock {
    public:
     uint64_t    stack_top;   ///< The Virtual Address of the Stack
-    //uint64_t    vas;         ///< Virtual address space, page table. //TODO: Get rid of this! Should use Task's VAS.
     TCBState    state;       ///< Flags
     const char* threadName;  ///< Thread name
     uint64_t    threadID;    ///< ID of the thread
