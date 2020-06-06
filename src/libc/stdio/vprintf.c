@@ -58,7 +58,6 @@ void vprintf(const char* fmt, va_list arg) {
             char buffer[8];  // We only handle up to 7 digits
             int  buff_index = 0;
             memset(&buffer, 0, 8);
-
             fmt_length_zeropad = (*fmt_scan == '0');
 
             while (*fmt_scan >= '0' && *fmt_scan <= '9' && buff_index < 7) {
@@ -102,7 +101,13 @@ void vprintf(const char* fmt, va_list arg) {
             case 'd':
                 arg_int = va_arg(arg, int);
                 arg_str = itoa(arg_int, 10);
-                vprintf_print_helper_string(arg_str);
+                if (fmt_left_justify) {
+                    vprintf_print_helper_string(arg_str);
+                    vprintf_print_padding_helper(fmt_length, arg_str, false);
+                } else {
+                    vprintf_print_padding_helper(fmt_length, arg_str, false);
+                    vprintf_print_helper_string(arg_str);
+                }
                 break;
                 
             case 'x':
