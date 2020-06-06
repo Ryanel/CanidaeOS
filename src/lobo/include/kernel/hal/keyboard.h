@@ -12,7 +12,7 @@ class keyboard {
     char             getchar_async();
 
    private:
-    const static uint64_t scancode_queue_max = 32;
+    const static uint64_t scancode_queue_max = 128;
     uint8_t               scancode_queue[scancode_queue_max];
     uint64_t              scancode_queue_sz = 0;
     bool                  mod_shift_set     = false;

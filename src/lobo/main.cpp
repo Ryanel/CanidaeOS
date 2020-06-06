@@ -6,6 +6,7 @@
 #include <kernel/debug/kernel_debugger.h>
 #include <kernel/driver.h>
 #include <kernel/driver_registry.h>
+#include <kernel/hal/keyboard.h>
 #include <kernel/mem/memmap.h>
 #include "kernel/cpu.h"
 #include "kernel/heap.h"
@@ -14,22 +15,25 @@
 #include "kernel/pmm.h"
 #include "kernel/scheduler.h"
 #include "kernel/vmm.h"
+
 using namespace kernel;
 
-void test_thread() {
+void thread_read_keyboard() {
     auto& kLog = log::Get();
     while (true) {
-        kLog.Log("lobo", "Entered k/test");
-        debug::debugger().get().enter();
-        kernel::scheduling::Scheduler::Get().Yield();
+        char c = kernel::hal::keyboard::get().getchar_async();
+        if (c == '~') {
+            kernel::debug::debugger::get().enter();
+        } else if (c != 0) {
+            kLog.WriteChar(c);
+        }
     }
 }
 
 void test_thread2() {
     auto& kLog = log::Get();
     while (true) {
-        kLog.Log("lobo", "Entered k/test2");
-        debug::debugger().get().enter();
+        // kLog.Log("lobo", "Entered k/test2");
         kernel::scheduling::Scheduler::Get().Yield();
     }
 }
@@ -50,6 +54,7 @@ void test_thread4() {
         kernel::scheduling::Scheduler::Get().Yield();
     }
 }
+
 void kernel_main() {
     auto& kLog        = log::Get();
     auto& kernelPmm   = kernel::pmm::get();
@@ -60,23 +65,18 @@ void kernel_main() {
     kernelPmm.debug_print_free_memory();  // Print how much memory was used
     kernelSched.Init();                   // Initialise the scheduler
 
-    debug::debugger().get().enter();
-
-    kernelSched.CreateThread("k/test", (void*)test_thread);
+    // Create test threads
+    kernelSched.CreateThread("k/keyboard", (void*)thread_read_keyboard);
     kernelSched.CreateThread("k/test2", (void*)test_thread2);
-    
-    auto* deadThread = kernelSched.CreateThread("k/test_dead", (void*)test_thread3);
-    deadThread->state = scheduling::TCBState::Dead;
-
-    auto* waitingThread = kernelSched.CreateThread("k/test_waiting", (void*)test_thread4);
+    auto* deadThread     = kernelSched.CreateThread("k/test_dead", (void*)test_thread3);
+    auto* waitingThread  = kernelSched.CreateThread("k/test_waiting", (void*)test_thread4);
+    deadThread->state    = scheduling::TCBState::Dead;
     waitingThread->state = scheduling::TCBState::Waiting;
 
     kernelSched.EnableScheduling();
 
     kLog.Log("lobo", "Entered idle thread");
 
-    kernelSched.Yield();
-    debug::debugger().get().enter();
-
+    // debug::debugger().get().enter();
     cpu::IdleLoop();
 }

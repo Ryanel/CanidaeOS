@@ -63,8 +63,7 @@ void debugger::enter() {
             }
 
             logger.Log("sched", "%d threads, %d schedulable", kernelSched.threads.size(), numSchedulable);
-
-            logger.Log("sched", "| %6s | %-20s | %7s |", "TID", "Thread Name", "State");
+            logger.Log("sched", "| %7s | %7s | %-20s | %7s |", "Task ID", "TID", "Thread Name", "State");
             for (auto itr = kernelSched.threads.begin(); itr != kernelSched.threads.end(); itr++) {
                 auto&       thread = itr.node->m_value;
                 const char* state;
@@ -86,7 +85,7 @@ void debugger::enter() {
                         state = "Unknown";
                         break;
                 }
-                logger.Log("sched", "| %6d | %-20s | %7s |", thread->threadID, thread->taskName, state);
+                logger.Log("sched", "| %7d | %7d | %-20s | %7s |",thread->taskID, thread->threadID, thread->threadName, state);
             }
         }};
 
@@ -128,6 +127,7 @@ void debugger::enter() {
             klog.Log("debug", "Command List:");
             klog.Log("debug", "pmm: pmm/free, pmm/freepages,");
             klog.Log("debug", "drivers: drivers/count, drivers/list");
+            klog.Log("debug", "scheduler: threads");
             klog.Log("debug", "debugger: help, exit");
         } else {
             // Search through commands

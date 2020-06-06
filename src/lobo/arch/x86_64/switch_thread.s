@@ -1,5 +1,8 @@
 global switch_thread
+global switch_task_vas
 
+; switch_thread: Switches the processor from one thread to another, within a task.
+; Args:
 ; rdi = address of new thread TCB
 ; rsi = address of current TCB
 switch_thread:
@@ -19,20 +22,9 @@ switch_thread:
     push r13
     push r14
     push r15
-
-    ; Save current stack pointer...
-    mov qword [rsi], rsp
-
+    mov qword [rsi], rsp ; Save current stack pointer...
     ; Load next thread state
-    mov rsp, [rdi]              ; Switch stacks
-    mov rcx, [rdi + (0x8 * 1)]  ; Load new tasks VAS physical address
-    mov rax, cr3                ; Load current threads VAS physical address
-    cmp rax, rcx                ; Check if New VAS == Old VAS
-
-    je .doneSwitchVAS           ; Don't flush TLB if they are the same
-    mov cr3, rax                ; Switch to new thread's VAS, flush TLB
-
-.doneSwitchVAS:
+    mov rsp, [rdi] ; Load previous stack pointer
     pop r15
     pop r14
     pop r13
@@ -47,6 +39,17 @@ switch_thread:
     pop rbx
     pop rdx
     pop rcx
-    pop rax
-    
+    pop rax    
+    ret
+
+; switch_task_vas: Switches the processor from one tasks VAS to another.
+; rdi = address of new task TCB
+; rsi = address of current TCB
+switch_task_vas:
+    mov rcx, [rdi + (0x8 * 0)]  ; Load new tasks VAS physical address
+    mov rax, cr3                ; Load current tasks VAS physical address
+    cmp rax, rcx                ; Check if New VAS == Old VAS
+    je .doneSwitchVAS           ; Don't flush TLB if they are the same
+    mov cr3, rax                ; Switch to new thread's VAS, flush TLB
+.doneSwitchVAS:
     ret

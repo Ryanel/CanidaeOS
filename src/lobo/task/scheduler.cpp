@@ -9,6 +9,7 @@
 using namespace kernel::scheduling;
 
 extern "C" void switch_thread(ThreadControlBlock* newThread, ThreadControlBlock* oldThread);
+extern "C" void switch_task_vas(TaskControlBlock* newTask, TaskControlBlock* oldTask);
 
 static Scheduler kernel_sched;
 
@@ -17,23 +18,43 @@ static int next_tid = 1;
 
 Scheduler& Scheduler::Get() { return kernel_sched; }
 
-void Scheduler::PrintTaskInfo(ThreadControlBlock* tcb) {
+void Scheduler::PrintThreadInfo(ThreadControlBlock* tcb) {
     assert(tcb != nullptr);
 
     auto& kLog = log::Get();
-    kLog.Log("sched", "Task %s: VAS: 0x%016p, Stack: 0x%016p", tcb->taskName, tcb->vas, tcb->stack_top);
+    kLog.Log("sched", "Thread %s: TID %d, Stack: 0x%016p", tcb->threadName, tcb->threadID, tcb->stack_top);
 }
 
 void Scheduler::Init() {
+    // Initialise the kernel task
+    kernelTask.state    = TCBState::Running;
+    kernelTask.taskName = "Lobo Kernel";
+    kernelTask.vas      = MEM_VIRT_TO_PHYS(vmm().get().pdir_kernel);
+    kernelTask.taskID   = 0;
+    tasks.push_back(&kernelTask);
+
     // Setup the kernel idle task...
-    idleThread.stack_top = 0;  // RSP will be filled in from the task switching function
-    idleThread.taskName  = "k/idle";
-    idleThread.vas       = MEM_VIRT_TO_PHYS(vmm().get().pdir_kernel);
+    idleThread.stack_top  = 0;  // RSP will be filled in from the task switching function
+    idleThread.threadName = "k/idle";
+    idleThread.taskID     = 0;  // Owned by the kernel...
 
     // We're currently in the "idle task"
     currentThread = &idleThread;
+    currentTask = &kernelTask;
+
+    SwitchTask(&kernelTask);
+
     SwitchThread(&idleThread);  // Switch to populate some values.
     threads.push_back(&idleThread);
+}
+
+void Scheduler::SwitchTask(TaskControlBlock* task) {
+    assert(task != nullptr);
+
+    TaskControlBlock * curTask = currentTask;
+    currentTask = task;
+
+    switch_task_vas(task, curTask);
 }
 
 void Scheduler::SwitchThread(ThreadControlBlock* newThread) {
@@ -53,11 +74,11 @@ ThreadControlBlock* Scheduler::CreateThread(const char* name, void* function) {
 
     uint64_t stackAddr = (uint64_t)kmalloc(THREAD_STACK_SIZE) + THREAD_STACK_SIZE;
 
-    toCreate->taskName  = name;                      // Set name
-    toCreate->stack_top = stackAddr - (0x8 * 0x10);  // Set rsp, as if we're in the middle of switch_thread
-    toCreate->vas       = MEM_VIRT_TO_PHYS(vmm().get().pdir_kernel);
-    toCreate->threadID  = next_tid++;  // TODO: Fix to be concurrency safe.
-    toCreate->state     = TCBState::Ready;
+    toCreate->threadName = name;                      // Set name
+    toCreate->stack_top  = stackAddr - (0x8 * 0x10);  // Set rsp, as if we're in the middle of switch_threadr_kernel);
+    toCreate->threadID   = next_tid++;  // TODO: Fix to be concurrency safe.
+    toCreate->state      = TCBState::Ready;
+    toCreate->taskID = currentTask->taskID;
 
     uint64_t* newStack = (uint64_t*)(toCreate->stack_top);
     newStack[0x00]     = 0;                    // r15
@@ -101,6 +122,7 @@ void Scheduler::Schedule() {
         currentThread->state = TCBState::Ready;
         new_thread->state    = TCBState::Running;
         SwitchThread(threads.at(currentThreadIndex));
+        // Critical Section End...
         break;
     }
 }
