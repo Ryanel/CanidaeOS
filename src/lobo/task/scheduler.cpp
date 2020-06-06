@@ -12,6 +12,9 @@ extern "C" void switch_thread(ThreadControlBlock* newThread, ThreadControlBlock*
 
 static Scheduler kernel_sched;
 
+// TODO: Fix
+static int next_tid = 1;
+
 Scheduler& Scheduler::Get() { return kernel_sched; }
 
 void Scheduler::PrintTaskInfo(ThreadControlBlock* tcb) {
@@ -53,6 +56,8 @@ ThreadControlBlock* Scheduler::CreateThread(const char* name, void* function) {
     toCreate->taskName  = name;                      // Set name
     toCreate->stack_top = stackAddr - (0x8 * 0x10);  // Set rsp, as if we're in the middle of switch_thread
     toCreate->vas       = MEM_VIRT_TO_PHYS(vmm().get().pdir_kernel);
+    toCreate->threadID  = next_tid++;  // TODO: Fix to be concurrency safe.
+    toCreate->state     = TCBState::Ready;
 
     uint64_t* newStack = (uint64_t*)(toCreate->stack_top);
     newStack[0x00]     = 0;                    // r15
@@ -81,11 +86,26 @@ void Scheduler::DisableScheduling() { schedulingEnabled = false; }
 
 void Scheduler::Schedule() {
     if (!schedulingEnabled) { return; }
+    unsigned int tries    = 0;
+    const int    maxTries = 500;
+    // Find a canidate thread...
+    while (true) {
+        if (++currentThreadIndex >= threads.size()) { currentThreadIndex = 0; }
+        auto new_thread = threads.at(currentThreadIndex);
+        if (new_thread->state != TCBState::Ready) {
+            tries++;
+            if (tries > maxTries) { return; }  // Give up. Can happen when it's only the idle thread.
+            continue;
+        }
+        // Critical Section Start
+        currentThread->state = TCBState::Ready;
+        new_thread->state    = TCBState::Running;
+        SwitchThread(threads.at(currentThreadIndex));
+        break;
+    }
+}
 
-    if (++currentThreadIndex >= threads.m_size) { currentThreadIndex = 0; }
-
-    auto* start_itr = threads.begin();
-    for (int i = 0; i < currentThreadIndex; i++) { start_itr = start_itr->next; }
-
-    SwitchThread(start_itr->value);
+void Scheduler::Yield() {
+    // TODO: Set thread remaining time to 0 to force an instant switch.
+    Schedule();
 }

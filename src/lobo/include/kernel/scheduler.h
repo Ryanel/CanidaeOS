@@ -1,20 +1,20 @@
 #pragma once
 
-#include <kernel/task.h>
 #include <common/single_linked_list.h>
+#include <kernel/task.h>
 namespace kernel {
 namespace scheduling {
 
 class Scheduler {
    public:
-    bool schedulingEnabled = false;
+    bool                schedulingEnabled = false;
     ThreadControlBlock  idleThread;
     ThreadControlBlock* currentThread;
 
     // TODO: Implement Round-Robin scheduling in a better way.
     // TODO: Add process support.
     common::single_linked_list<ThreadControlBlock*> threads;
-    size_t currentThreadIndex = 0;
+    size_t                                          currentThreadIndex = 0;
 
    public:
     static Scheduler&   Get();
@@ -25,7 +25,8 @@ class Scheduler {
     void                PrintTaskInfo(ThreadControlBlock* tcb);
     void                EnableScheduling();
     void                DisableScheduling();
-    void                Schedule();  // Switch to the next thread.
+    void                Schedule();  ///< Switch to the next thread.
+    void                Yield();     ///< Yields the rest of this threads time
 };
-}  // namespace Scheduling
-}  // namespace Kernel
+}  // namespace scheduling
+}  // namespace kernel
