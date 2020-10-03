@@ -1,7 +1,5 @@
-#ifndef AWD_INFO_H
-#define AWD_INFO_H
+#pragma once
 
-#include <awd/memmap.h>
 #include <stdint.h>
 
 typedef struct {
@@ -18,5 +16,3 @@ typedef struct {
     // Misc
     uint32_t log_cursor_y;
 } awd_info_t;
-
-#endif

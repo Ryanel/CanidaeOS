@@ -1,33 +1,21 @@
-#ifndef AWD_CONSOLE_H
-#define AWD_CONSOLE_H
+#pragma once
 
 #include <stdint.h>
 
-/// Initialises the console
+#define CONSOLE_DEFAULT_COLOR 0x0F
+#define CONSOLE_WARNING_COLOR 0x0E
+#define CONSOLE_ERROR_COLOR   0x4F
+
 void console_init();
 
-/// Writes a character a (x,y) with c as the character to print, with the color att
-void console_writechar(unsigned int x, unsigned int y, char c, unsigned char att);
+void console_write_char(unsigned int x, unsigned int y, char c, unsigned char attribute);
+void console_write_serial(char c);
 
-/// Prints a character to the screen
-void console_printchar(char c);
+void console_print_char(char c);
+void console_print_string(const char* s);
 
-/// Prints a string to the screen
-void console_printstring(const char* s);
+void console_clear();
 
-/// Change the color
-void console_color(unsigned char newColor);
+void console_set_color(unsigned char attr);
 
-/// Get X coordinate
-unsigned int console_getX();
-
-/// Get Y coordinate
-unsigned int console_getY();
-
-/// Log to screen in a nice formatted way
-void console_log(const char* cat, const char* fmt, ...);
-
-/// Print a 64-bit number correctly
-void console_print_uint64(uint64_t tp);
-
-#endif  // AWD_CONSOLE_H
+int console_get_y();

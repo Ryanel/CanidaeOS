@@ -110,7 +110,10 @@ void vmm::unmap_pages(page_table_t* p4, logical_addr_t addr, size_t size) {
 
 void vmm::swap_page_directory(page_table_t* newMemorySpace) {
     physical_addr_t phys_addr = MEM_VIRT_TO_PHYS(newMemorySpace);
-    asm("cli");  // TODO: Replace with real lock
+
+    log::Get().Log("vmm", "swap page dir: %p phys addr %p\n", newMemorySpace, phys_addr);
+
+    asm("cli;");  // TODO: Replace with real lock
     pdir_current = newMemorySpace;
     asm volatile("movq %0, %%cr3;" ::"r"(phys_addr));
     asm("sti");  // TODO: Replace with real unlock

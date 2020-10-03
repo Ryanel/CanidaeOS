@@ -21,17 +21,17 @@ gdt64:
 ; Data
 ; -----------------------------------------------------------------------------
 section .data
-global k_ptr
+global kernel_entry_point
 align 8
-k_ptr:
+kernel_entry_point:
 	dq	0x400000
 
 ; text
 ; -----------------------------------------------------------------------------
 section .text
-global enter_kernel
+global kernel_enter
 
-enter_kernel:
+kernel_enter:
     lgdt [gdt64.pointer]
     jmp gdt64.code:longmode_enter_kernel
 
@@ -39,8 +39,8 @@ enter_kernel:
 ; -----------------------------------------------------------------------------
 bits 64
 global long_mode_start
-extern awd_boot_info
+extern awd_info
 longmode_enter_kernel:
-    mov rbx, awd_boot_info
-    mov rax, [k_ptr]
+    mov rbx, awd_info
+    mov rax, [kernel_entry_point]
     jmp rax

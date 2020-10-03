@@ -46,7 +46,7 @@ const char* exception_strings[] = {"Divide By Zero",
 
 extern "C" void fault_handler(struct InterruptContext* r) {
     auto& log = log::Get();
-    // KernelLog::Get().Log("int", "Caught an interrupt! %d, error %p", r->int_no, r->err_code);
+    log.Log("int", "Caught an interrupt! %d, error %p", r->int_no, r->err_code);
 
     if (r->int_no < 32) {
         log.LogRaw("%35sException\n", "");
@@ -106,8 +106,8 @@ idt_table_entry_t idt_populate_entry(uint64_t entry, uint16_t cs_selector, uint8
     idt_entry.cs_selector = cs_selector;
     idt_entry.attributes  = attributes;
     // Already memset to zero
-    // idt_entry.zero_2 = 0;
-    // idt_entry.ist    = 0;
+    idt_entry.zero_2 = 0;
+    idt_entry.ist    = 0;
     return idt_entry;
 }
 
@@ -184,9 +184,8 @@ void init_idt() {
     // Flush the IDT
     table_idt_ptr.address = (uint64_t)(&table_idt);
     table_idt_ptr.limit   = (sizeof(idt_table_entry_t) * 256) - 1;
+
     interrupt_set_idt((uint64_t)(&table_idt_ptr));
-
-    kernelLog.Log("int", "Interrupts enabled");
-
     asm("sti");  // Start interrupts
+    kernelLog.Log("int", "Interrupts enabled");
 }

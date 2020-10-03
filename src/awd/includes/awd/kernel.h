@@ -1,19 +1,25 @@
-#ifndef AWD_KERNEL_H
-#define AWD_KERNEL_H
+#pragma once
 
 #include <stdint.h>
 
-#include "multiboot.h"
+typedef struct kernel_region {
+    uint64_t start;
+    uint64_t size;
+} kernel_region_t;
 
-typedef struct LoadedKernelInfo {
-    uint64_t phys_entry;
-    uint64_t virt_entry;
-    uint64_t phys_start;
-    uint64_t phys_size;
-    uint64_t virt_start;
-    uint64_t virt_size;
-} loaded_kernel_info_t;
+typedef struct kernel_info {
+    uint32_t image_start;
+    uint32_t image_end;
 
-multiboot_module_t *awd_find_kernel(const multiboot_info_t *mb_info);
-loaded_kernel_info_t awd_load_kernel(uint32_t kernelFileAddress);
-#endif
+    kernel_region_t phys;
+    kernel_region_t virt;
+} kernel_info_t;
+
+typedef struct kernel_loaded_info {
+    kernel_region_t memory_image;
+    kernel_region_t virt;
+    uint64_t virtual_entry;
+} kernel_loaded_info_t;
+
+kernel_info_t kernel_analyse(kernel_info_t info);
+kernel_loaded_info_t kernel_load(kernel_info_t info);

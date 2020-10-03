@@ -84,6 +84,8 @@ irq_common:
 
 global interrupt_set_idt
 interrupt_set_idt:
+    push rax
+    pop rax
     lidt [rdi]
     ret
 

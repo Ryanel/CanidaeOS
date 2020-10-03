@@ -10,7 +10,7 @@ extern _init
 section .bss
 align 16
 stack_bottom:
-    resb 16384 ; 16KB of Stack
+    resb 32768 ; 16KB of Stack
 stack_top:
 
 ; Text

@@ -28,12 +28,13 @@ void vmm::init() {
 void vmm::init_kernel_page_directory() {
     pdir_kernel = (page_table_t*)kmalloc_aligned(0x1000, 0x1000);
     memset(pdir_kernel, 0, PAGE_SIZE);
-
     const uint8_t flags = (VMM_PAGE_PRESENT | VMM_PAGE_WRITE);
 
-    map_pages(pdir_kernel, 0xffffffff80000000, MEM_VIRT_TO_PHYS(0xffffffff80000000), 0x200000, flags);  // 0MB -> 2MB
-    map_pages(pdir_kernel, 0xffffffff80200000, MEM_VIRT_TO_PHYS(0xffffffff80200000), 0x200000, flags);  // 2MB -> 4MB
+    //map_pages(pdir_kernel, 0, 0, 0x200000, flags);  // 0MB -> 2MB
+    //map_pages(pdir_kernel, 0xffffffff80000000, MEM_VIRT_TO_PHYS(0xffffffff80000000), 0x213000, flags);  // 0MB -> 2MB
 
+    // TODO: FIXME, map kernel based on provided tables.
+    
     pdir_current = pdir_kernel;
     swap_page_directory(pdir_kernel);
 

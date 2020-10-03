@@ -10,7 +10,7 @@
 void VGAConsoleDevice::Init(int curX, int curY) {
     x = curX;
     y = curY;
-    bufferAddr = MEM_PHYS_TO_VIRT(0xB8000); // TODO: Convert to virtual
+    bufferAddr = 0xB8000; // TODO: Convert to virtual
 }
 
 void VGAConsoleDevice::PrintChar(const char c) {

@@ -31,7 +31,7 @@ void thread_read_keyboard() {
 }
 
 void test_thread2() {
-    auto& kLog = log::Get();
+    //auto& kLog = log::Get();
     while (true) {
         // kLog.Log("lobo", "Entered k/test2");
         kernel::scheduling::Scheduler::Get().Yield();
@@ -46,6 +46,7 @@ void test_thread3() {
         kernel::scheduling::Scheduler::Get().Yield();
     }
 }
+
 void test_thread4() {
     auto& kLog = log::Get();
     while (true) {
@@ -62,17 +63,19 @@ void kernel_main() {
 
     kLog.Log("lobo", "Entered Kernel Main");
 
-    kernelPmm.debug_print_free_memory();  // Print how much memory was used
-    kernelSched.Init();                   // Initialise the scheduler
+    kernelPmm.debug_print_free_memory(); // Print how much memory was used
+    kernelSched.Init();                  // Initialise the scheduler
 
     // Create test threads
     kernelSched.CreateThread("k/keyboard", (void*)thread_read_keyboard);
     kernelSched.CreateThread("k/test2", (void*)test_thread2);
+
+    // Create some test threads...
     auto* deadThread     = kernelSched.CreateThread("k/test_dead", (void*)test_thread3);
     auto* waitingThread  = kernelSched.CreateThread("k/test_waiting", (void*)test_thread4);
     deadThread->state    = scheduling::TCBState::Dead;
     waitingThread->state = scheduling::TCBState::Waiting;
-
+    
     kernelSched.EnableScheduling();
 
     kLog.Log("lobo", "Entered idle thread");

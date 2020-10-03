@@ -1,0 +1,9 @@
+#pragma once
+
+#define PAGE_SIZE 0x1000
+#define AWD_ALLOC_SIZE (64 * PAGE_SIZE)
+#define AWD_ALLOC_MIN_ALIGNMENT 8
+
+#define KERNEL_TAG_NAME "kernel"
+
+#define AWD_MODULES_VIRT_BASE 0xE0000000

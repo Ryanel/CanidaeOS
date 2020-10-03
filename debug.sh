@@ -4,6 +4,7 @@ qemu-system-x86_64 -cdrom build/bootable.iso \
 -usb -vga std \
 -device sga \
 -no-shutdown -no-reboot \
--serial stdio \
--s -S \
+-s \
+-monitor stdio \
+#-d int \
 #-nographic \

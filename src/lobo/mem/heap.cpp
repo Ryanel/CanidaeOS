@@ -10,12 +10,12 @@
 
 using namespace kernel;
 
-//#define KERNEL_HEAP_DEBUG_PRINT
+#define KERNEL_HEAP_DEBUG_PRINT
 
 enum class AllocMode { Uninitialised, EarlyBoot, Full };
 
-uint64_t  earlyAllocBase  = 0x400000;
-uint64_t  earlyAllocLimit = 0x600000;
+uint64_t  earlyAllocBase  = 0;
+uint64_t  earlyAllocLimit = 0;
 AllocMode currentMode     = AllocMode::Uninitialised;
 
 uintptr_t heap_early_get_current() { return earlyAllocBase; }

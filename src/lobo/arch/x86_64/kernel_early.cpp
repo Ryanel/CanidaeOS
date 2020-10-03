@@ -92,10 +92,8 @@ extern "C" void kernel_early(awd_info_t* awd_info) {
     kernelLog.Log("debug", "   Kernel VM Base: 0x%016p", (uint64_t)(&KERNEL_VMB));
     kernelLog.Log("debug", "Kernel VM Address: 0x%016p", (uint64_t)(&KERNEL_VMA));
 #endif
-
     // Step 5: Enable Interrupts
     init_idt();
-
     // Step 6: Initialise memory
     kernelVmm.init();                              // Initialise paging structures...
     init_memory((awd_info_t*)MEM_PHYS_TO_VIRT(awd_info));  // Initialise the PMM
